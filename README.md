@@ -63,7 +63,8 @@ on by default: before it can be, Claude spells out in your own numbers what it
 will do alone and the worst day in dollars, and you type a sentence to accept it.
 Until that line and the Meta safety rules exist, autopilot behaves like
 approval&nbsp;mode. A spend cap goes into Meta itself for every policy (the total, or 31 days of the
-ceiling or the daily budget). With autopilot or an always-on budget, two safety rules
+ceiling or the daily budget); for an always-on policy the check-in extends it by a
+month when 90% is spent, on its own in autopilot and on your word otherwise. With autopilot or an always-on budget, two safety rules
 go in as well, so they work while your Mac is off: pause any ad that spends your pause multiple of the target (3 by default) with no result,
 and alert you when the campaign's cost runs 50% over&nbsp;target.
 
