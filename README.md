@@ -64,7 +64,7 @@ will do alone and the worst day in dollars, and you type a sentence to accept it
 Until that line and the Meta safety rules exist, autopilot behaves like
 approval&nbsp;mode. A spend cap goes into Meta itself for every policy (the total, or 31 days of the
 ceiling or the daily budget). With autopilot or an always-on budget, two safety rules
-go in as well, so they work while your Mac is off: pause any ad that spends three times your target with no result,
+go in as well, so they work while your Mac is off: pause any ad that spends your pause multiple of the target (3 by default) with no result,
 and alert you when the campaign's cost runs 50% over&nbsp;target.
 
 ## What it will not do on its own
@@ -73,7 +73,7 @@ and alert you when the campaign's cost runs 50% over&nbsp;target.
 - Spend credits on a new video before you say yes to the cost, or in autopilot, past your daily&nbsp;limit.
 - Change targeting or the ad set. The folder's settings deny 60 connector tools and make the three build-time ones (a new campaign, a new ad set, a new Meta rule) ask first, so an unattended run cannot reach&nbsp;them.
 - Act on a reply meant for an older report: every "do it" carries the report's time, and a bare "do it" gets a question&nbsp;back.
-- Pause the last two running ads in the ad set, even in autopilot. It recommends it&nbsp;instead.
+- Pause the last two running ads in the ad set, even in autopilot. It recommends it instead. Meta's own rule has no such floor, so the next check-in flags an ad set left with fewer than two live ads before anything&nbsp;else.
 - Change a budget in any way `ads/rules.py` did not return, or go past your
   total, your ceiling or your ask-first&nbsp;line.
 
