@@ -1,0 +1,79 @@
+{
+  "_note": "Physics is the failure mode that has cost this project more than everything else combined. Eight image-to-video takes were rejected on physics; the one clip the operator approved on physics was a motion transfer. This file encodes why, and what to do instead of rolling again.",
+  "the_rule": {
+    "headline": "Physics cannot be reliably prompted into existence. It can be transferred.",
+    "routing": [
+      "1. ACTION BEAT -> motion transfer FIRST, not as a fallback. Feed real footage as the driving video. The weight, acceleration and ground contact come from the real world by construction, so there is nothing for the model to invent.",
+      "2. Only if no driving clip exists, use first-frame-to-last-frame with BOTH endpoints locked, so the model interpolates between two real poses instead of inventing a trajectory.",
+      "3. Text-to-video for an action beat is the last resort. It is what failed eight times here."
+    ],
+    "evidence": "The original project's kling_takes folder (not shipped with the engine). mt_door_take1 (motion transfer) was approved on physics with only the plate wrong. DOOR_BURST_v1 through v5 (image-to-video) were all rejected, and both measured takes sit under 0.02 mean frame-to-frame change while the real reference footage measures 0.027."
+  },
+  "prompt_language": {
+    "principle": "Describe FORCES and CONTACT, not adjectives about energy. A model can render a described contact. It cannot render 'violent'.",
+    "swap": [
+      {
+        "weak": "he explodes through the door, violent and aggressive",
+        "strong": "his palm strikes the door flat and high; the door swings hard and rebounds off the wall; his weight lands on the front foot, then his shoulder follows through the gap"
+      },
+      {
+        "weak": "she reacts, startled and frightened",
+        "strong": "her shoulders pull back and her chair slides an inch on the floor; her hands come up, then her head turns"
+      },
+      {
+        "weak": "he charges in at full sprint, frantic",
+        "strong": "he takes two long strides, his momentum carries him half a step past where he means to stop, and he checks himself against the table edge"
+      },
+      {
+        "weak": "the bat swings powerfully overhead",
+        "strong": "the bat lags behind his hands at the top of the arc, then whips past them on the way down; his hips turn first and his arms follow"
+      },
+      {
+        "weak": "dramatic, high-energy movement",
+        "strong": "name the contact, the direction of force, what resists it, and what happens after the force stops"
+      }
+    ],
+    "checklist": [
+      "Where does the force enter, and on what surface?",
+      "What resists it, and does it give or hold?",
+      "Which body part leads, and which follows? Hips first, then arms. Weight first, then shoulder.",
+      "What happens AFTER the force stops? Momentum has to go somewhere.",
+      "Does anything take the recoil?"
+    ],
+    "never": [
+      "Adjectives as physics. 'Violent', 'powerful', 'explosive' and 'frantic' describe a feeling, not a motion, and the model renders the feeling as speed with no weight.",
+      "Two forces in one beat. One contact per shot. A shove AND a charge AND a swing in three seconds is why bodies come out floating."
+    ],
+    "_banned_words_warning": "director.md bans the bare words earlier, before, previous, again, return, continue, as before, last time and unlike before ANYWHERE in a Seedance prompt - Seedance has zero memory, so anything that reads as a reference to another clip is forbidden. That includes using 'before' for ordering INSIDE one shot. Write 'then' and 'first ... follows' instead. The first draft of this file failed its own validator on exactly this."
+  },
+  "failure_signatures": {
+    "floats / no weight": "The body moves at constant speed with no acceleration and no settle. Cause: the prompt named an emotion instead of a contact. Fix: name the contact and what resists it, or transfer the motion.",
+    "puppet limbs": "Arms and legs move independently of the torso. Cause: too many simultaneous actions. Fix: one contact per shot.",
+    "held pose": "A third of the clip is the same frame. Cause: the model had no trajectory to follow. Fix: first-frame-to-last-frame, or a driving clip. Measured by scripts/watch_take.py.",
+    "object does not react": "A door opens without resistance, a prop has no mass. Cause: the object was described as scenery, not as something being acted on. Fix: give the object its own reaction in the prompt, or transfer."
+  },
+  "driving_clips": {
+    "what": "Short real-footage clips used as the motion source for transfer. Build once, reuse across every film.",
+    "location": "motion/ in this repo",
+    "requirements": [
+      "3 seconds or longer - Seedance rejects shorter reference videos with a bare E006",
+      "must carry an audio track - Wan crashes on a silent driving clip",
+      "cut BEFORE any burned-in caption, or mask it - the model renders text as garbage ('WHAT AI TOOLS' came out as 'AATMAN')",
+      "native speed only - never slow it and speed the output back up, it drops frames"
+    ],
+    "pipeline": [
+      "STAGE 1  bytedance/seedance-2.0 with reference_videos=[driving clip], NO reference_images, the character described in the prompt, 720p, 9:16. This regenerates the action in YOUR location. Run 3-5 and cherry-pick.",
+      "STAGE 2  wan-video/wan-2.2-animate-replace with the stage 1 output plus your character still. animate-replace KEEPS the plate, which is correct now that the plate is yours. animate-animation moves a character into a NEW scene instead.",
+      "STAGE 3  scripts/grade.py"
+    ],
+    "cost": "about $0.60 and six minutes per shot"
+  },
+  "models_for_hard_physics": {
+    "_status": "Reachable on this Replicate token, verified. NONE of these has been tested on this project - treat any of them as an experiment with a stated cost, not a fix.",
+    "google/veo-3": "Strongest general reputation for physical dynamics. Worth one head-to-head against the current path on a single hard beat before anything larger.",
+    "minimax/hailuo-02": "Also known for physical realism. Cheaper than Veo.",
+    "kwaivgi/kling-v2.5-turbo-pro": "Kling through Replicate rather than the MCP, so it is scriptable.",
+    "wan-video/wan-2.5-t2v": "Newer Wan.",
+    "how_to_test": "One beat, one variable. Same prompt, same reference, run the current path and the candidate, then scripts/watch_take.py --kind action on both and put both in front of the operator. Change nothing else - that is the guide's rule one and it is what makes the comparison mean anything."
+  }
+}

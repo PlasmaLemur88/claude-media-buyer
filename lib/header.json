@@ -1,0 +1,59 @@
+{
+  "_note": "The mandated Seedance prompt structure. Every line template here appears verbatim in lib/director.md under SEEDANCE PROMPT STRUCTURE. The engine had no copy of this, which meant nothing could check the header at all - and the header is where every reference is defined.",
+
+  "order": [
+    "Main Subjects:",
+    "character_lines",
+    "costume_rules",
+    "object_lines",
+    "screen_lines",
+    "scene_line",
+    "expression_lines",
+    "Visual tone:",
+    "Camera feel:",
+    "NO MUSIC, only natural ambient sounds.",
+    "No texts or subtitles on screen.",
+    "SHOTS"
+  ],
+
+  "templates": {
+    "subjects_header": "Main Subjects:",
+    "character": "• [Character name] face and outfit 100% matched based exactly on @",
+    "object": "[Object/asset name] 100% matched based exactly on @",
+    "screen": "[Screen name] display content 100% matched based exactly on @",
+    "scene": "Scene setting is based on @",
+    "tone": "Visual tone: [paste the selected tone string verbatim from lib/tones.json]",
+    "feel": "Camera feel: [Handheld Shaky Camera or Static Shot - exact library string]",
+    "no_music": "NO MUSIC, only natural ambient sounds.",
+    "no_subtitles": "No texts or subtitles on screen.",
+    "shots_header": "SHOTS"
+  },
+
+  "shot_line": "[X-Ys] - [A-ROLL or B-ROLL if applicable]. [Camera shot size / angle - exact library prompt]. [Camera movement - exact library prompt, if any]. [Action description with name @ for every reference visible in this shot]. [Character name] @ [says/mutters/yells/whispers etc] out loud: \"[dialogue]\"",
+
+  "conditional": {
+    "object": "only if it appears in this clip",
+    "screen": "only if a screen appears in this clip",
+    "scene": "only if a location image exists - otherwise REPLACE this line with a short written setting description. Never both.",
+    "aroll_broll_label": "only when the operator has confirmed B-roll. Omit for pure narrative or scripted fiction."
+  },
+
+  "screen_shot_lines": {
+    "with_reference": "[Screen device] screen displaying the [Screen name] @ as defined in the header, visible and legible on screen",
+    "green_screen_placeholder": "solid bright green screen placeholder with a white cross in each of the four corners and one white cross in the center of the display, clearly visible and legible on screen",
+    "_crosses": "Five white crosses total: four corners, one center. Mandatory every single time a green screen placeholder is used. Never omit them."
+  },
+
+  "at_rule": {
+    "header": "Every reference is defined in the header with its label BEFORE the @, and the @ itself is completely blank. Nothing after it, ever.",
+    "shots": "Visible in the shot = name @. Not visible in the shot (mentioned in dialogue, or an off-screen voice) = name only, no @."
+  },
+
+  "never": [
+    "Never describe a character physically in a Seedance prompt. No skin tone, no hair colour, no outfit details. The @ does all the work.",
+    "Include only what actually appears in THIS clip. A character who does not appear must not be in this clip's header.",
+    "A character who appears even briefly in the background still must be in the header.",
+    "Never write dialogue as a voiceover, and never label it 'DIALOGUE:'. Write it as a character action: 'Sarah @ mutters to herself:'",
+    "Repeat any special costume or appearance rules in every single prompt without exception."
+  ]
+}

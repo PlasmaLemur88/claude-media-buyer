@@ -1,0 +1,362 @@
+{
+  "_help": "One brand's data: everything a renderer or a script reads. Copy with `python3 scripts/brand.py new <slug>`, fill it, run `brand.py check <slug>` until it reports 0 problems, then `brand.py use <slug>`. Keys starting with _ are notes and are never read. Any path starting with assets/ is relative to this brand's folder; `use` copies assets/ to motion-graphics/public/brand-active/ and rewrites the path, so a config refers to the same file as brand-active/<rest>. Leave a field \"\" to hide what it draws. A field you do not know yet: write UNKNOWN and check lists it. The human side (who, voice, do and never, sources) is BRAND-GUIDE.md; keep the two in step.",
+  "brand": {
+    "_help": "Identity. slug = the folder name. name = exactly as written on screen. written = how the name must and must never be written. what = the free and paid products in one sentence. audience = who buys, with shares if known. file_prefix = the first token of every delivered filename (short, capitals, e.g. ACME). output_root = where finished ads land; \"\" means motion-graphics/out/<slug>/, an absolute path keeps the work outside the engine.",
+    "slug": "",
+    "name": "",
+    "written": "",
+    "what": "",
+    "audience": "",
+    "file_prefix": "",
+    "output_root": ""
+  },
+  "claims": {
+    "_help": "Every number or fact an ad may state, each with its source and date, e.g. \"subscribers\": \"12,000. Source: the mailing tool dashboard, 2026-01-05\". A claim with no source does not go in an ad."
+  },
+  "never": [],
+  "_never_help": "Hard rules, one sentence each: banned words, claims never made, people never shown, anything legal ruled out. Check every script against these before rendering.",
+  "people": {
+    "_help": "One key per person who may appear or be named: real footage allowed, cloning allowed (and whose written consent), how they are named on screen. Empty if no people appear."
+  },
+  "offer": {
+    "_help": "The offer in its exact words. free = the free step (routes_to: where the click goes, cta: the button, close: the closing line, whose sentences after the brand name also become the end-card sublines). paid = the paid step (cta, outro = the spoken paid close, price as it may be said). A brand with only one step fills free and leaves paid blank. one_place = a reminder that the offer is edited here, never in one ad.",
+    "free": {
+      "routes_to": "",
+      "cta": "",
+      "close": ""
+    },
+    "paid": {
+      "routes_to": "",
+      "cta": "",
+      "outro": "",
+      "price": ""
+    },
+    "one_place": "The offer lives in exactly one place. To change it, change it here and re-render."
+  },
+  "offer_numbers": {
+    "_help": "The numbers the paid formats print (AerialKinetic, OfferCard, the Cards ledger). readers and members are display strings (\"12,000\", \"600+\"); total (the dollar value of included deals), tools (how many deals) and price (a year) are numbers; currency is the symbol printed before money. Verify each at source before a render that will run. A config can override any of them.",
+    "readers": "",
+    "members": "",
+    "total": 0,
+    "tools": 0,
+    "price": 0,
+    "currency": "$"
+  },
+  "what_works": {
+    "_help": "Optional notes for script writers: hook style, script shape, headline style, what was tested and lost."
+  },
+  "judged_on": {
+    "_help": "Optional: the one metric an ad is judged on, and why.",
+    "metric": ""
+  },
+  "delivery": {
+    "_help": "Optional notes: ratios, lengths, music, what ships per ad."
+  },
+  "palettes": {
+    "_help": "Two palettes. dark: light text on a dark ground (OneWord, dark Cards). paper: dark text on a light ground (paper Cards). bg and ink need at least 7:1 contrast (check warns under it). accent has ONE job, marking what the eye lands on; it must pop on both bg and ink. muted = secondary lines, dim = inactive text. captionBg = the Cards caption band (default bg). wordmark = the platform or product wordmark on the end card for this ground (\"\" hides it). scrimTo = CSS gradient that fades artwork into the caption band. readOnLarge = colour of the small label above the wordmark on the large Cards end card (default muted).",
+    "dark": {
+      "bg": "",
+      "ink": "",
+      "accent": "",
+      "muted": "",
+      "dim": "",
+      "captionBg": "",
+      "wordmark": "",
+      "scrimTo": "",
+      "readOnLarge": ""
+    },
+    "paper": {
+      "bg": "",
+      "ink": "",
+      "accent": "",
+      "muted": "",
+      "dim": "",
+      "captionBg": "",
+      "wordmark": "",
+      "scrimTo": "",
+      "readOnLarge": ""
+    }
+  },
+  "fonts": {
+    "_help": "CSS font stacks for OneWord and Cards (serif = headlines and captions, sans = labels, sansCards = Cards labels, default sans). files = font files to load first, each {family, file, weight}; put the file in assets/fonts/ and use its family name at the front of a stack. Only fonts whose licence allows use in ads (SIL OFL is safe). System stacks need no file.",
+    "serif": "",
+    "sans": "",
+    "sansCards": "",
+    "files": []
+  },
+  "end_card": {
+    "_help": "The end card of OneWord and Cards, and the person byline. avatar = round photo or mark (\"\" hides it). platformLabel = small label above the palette wordmark, e.g. \"Read it on\" (\"\" hides both). freeSubline / paidSubline = lines under the name (\"\" derives them from offer.free.close). cta = the button (\"\" uses offer.free.cta). paidFollowOn + paidFollowOnAccent = the second line on PAID cuts, the accent part in the accent colour. offerEyebrow = the label that appears on PAID OneWord cuts where the offer starts.",
+    "avatar": "",
+    "platformLabel": "",
+    "freeSubline": "",
+    "paidSubline": "",
+    "cta": "",
+    "paidFollowOn": "",
+    "paidFollowOnAccent": "",
+    "offerEyebrow": ""
+  },
+  "voice": {
+    "_help": "Defaults for scripts/voice.py; `brand.py show` prints the full command. engine = gemini | minimax | elevenlabs | seed | seedance (or \"\" when a real person records). voice = the engine's voice name or id. style = the style prompt (gemini, seedance). speed = playback speed (1.0 = as generated). say_as = {\"Spelling\": \"SaidAs\"} applied to the TTS text only; `use` writes it to .say_as.active.json for --say-as.",
+    "engine": "",
+    "voice": "",
+    "style": "",
+    "speed": 1.0,
+    "say_as": {}
+  },
+  "rsvp": {
+    "_help": "OneWord (RSVP) tuning; delete any key to use the engine default shown. anchor = where the fixed letter sits, as a share of frame width (move LEFT for long words, never centre the word). sizes = [maxChars, px] buckets, first match wins, null = every longer word. shortWordMax / accentRun = words this short get no accent run, others get accentRun extra accent letters. bg = the ground behind the words. freeEndCard / paidEndCard = end-card seconds. bedUnderVoice / bedUnderCard = music level under the read and under the card.",
+    "anchor": 0.4,
+    "sizes": [
+      [
+        5,
+        240
+      ],
+      [
+        8,
+        196
+      ],
+      [
+        11,
+        145
+      ],
+      [
+        null,
+        108
+      ]
+    ],
+    "shortWordMax": 4,
+    "accentRun": 1,
+    "bg": "",
+    "freeEndCard": 3.2,
+    "paidEndCard": 3.6,
+    "bedUnderVoice": 0.14,
+    "bedUnderCard": 0.5
+  },
+  "featured": [],
+  "_featured_help": "The deals or partners allowed on screen as logo tiles (AerialKinetic deals wall, OfferCard rows), in wall order: [{\"name\": \"Partner\", \"src\": \"assets/logos/partner.png\"}]. Only deals a customer can actually redeem.",
+  "ledger": {
+    "_help": "The Cards format's PAID outro: free column on the left, paid column on the right. freeLabel / freeRows = the free column. paidLabel = the paid column's label. price = the price line, lit on the first spoken word in priceCues. worth = the line after it, lit on worthCue. tools = logo chips: [{name, file: \"assets/logos/x.svg\", kind: \"lockup\" | \"icon\"}] (icon = the name is set beside the mark). more = text after the chips (\"\" hides it). extras = [[label, the spoken word that cues it in]].",
+    "freeLabel": "",
+    "freeRows": [],
+    "paidLabel": "",
+    "price": "",
+    "priceCues": [],
+    "worth": "",
+    "worthCue": "",
+    "tools": [],
+    "more": "",
+    "extras": []
+  },
+  "aerial": {
+    "_help": "AerialKinetic. font = the one typeface {family, file, weight}. markColor = ring round the person byline. accent / accentWord / accentInk = pills and buttons / lit spoken words / text on the accent. mark = round brand mark (logo byline). personName = the person's name beside end_card.avatar (person byline). cobrandBy = the line under the name when the mark leads and the person rides on it. platformWordmark / platformMark = the free product's wordmark and square mark. communityLogo = the paid product's square mark. hookLabel = the word on the person who lights up in the default hook graphic. wallThumbs = video thumbnails for the 'wall of videos' (may be empty: grey tiles). copy = every string the format prints; {price} {cents} {total} {tools} {readers} {members} {unit} {units} are filled per ad; rows = [[label, sub-line, spoken cue word]]. beats = which graphic a sentence gets, first match wins: {beat: hook|bridge|identity|platform|community|deals|close, any: [words], starts: [opening words]}; {price} and {total} expand to $180, $1250. cues = single spoken words that time a piece of a graphic. keys = words lit in accentWord as they are said.",
+    "font": {
+      "family": "",
+      "file": "",
+      "weight": "100 900"
+    },
+    "markColor": "",
+    "accent": "",
+    "accentWord": "",
+    "accentInk": "#fff",
+    "mark": "",
+    "personName": "",
+    "cobrandBy": "",
+    "platformWordmark": "",
+    "platformMark": "",
+    "communityLogo": "",
+    "hookLabel": "",
+    "wallThumbs": [],
+    "copy": {
+      "unit": "",
+      "units": "",
+      "communityLine": "",
+      "perDay": "",
+      "coverPrice": "",
+      "coverPerDay": "",
+      "button": "",
+      "readersPill": "",
+      "membersPill": "",
+      "readersChip": "",
+      "membersChip": "",
+      "newsletterTitle": "",
+      "newsletterSub": "",
+      "freeBadge": "",
+      "communityTitle": "",
+      "cadence": "",
+      "rows": [],
+      "dealsLine": "",
+      "wallCount": "",
+      "wallLength": "",
+      "wallAnswer": ""
+    },
+    "beats": [],
+    "cues": {
+      "hookShow": "",
+      "hookFade": "",
+      "hookLight": "",
+      "wall": [],
+      "wallClear": "",
+      "readers": "",
+      "members": "",
+      "platform": "",
+      "free": "",
+      "community": "",
+      "cadence": "",
+      "deals": "",
+      "join": ""
+    },
+    "keys": []
+  },
+  "offer_card": {
+    "_help": "OfferCard. font = {family, file, weight}. accent = checks, eyebrow, highlighted row edge, button glow. captionAccent = the word being said in the caption band. rowHighlight = background of the row being said. shine = the headline shine colour on a dark and a light card. mark = round brand mark (logo byline). personName = name beside end_card.avatar (person byline). communityLogo / cardTitle = the card's header. bylinePerson / bylineLogo = the line under the byline name ({readers}). button / perDay = button text and the line under it ({price} {cents}). captionFixes = [[regex, flags, replacement]] for words Whisper mishears.",
+    "font": {
+      "family": "",
+      "file": "",
+      "weight": "100 900"
+    },
+    "accent": "",
+    "captionAccent": "",
+    "rowHighlight": "",
+    "shine": {
+      "dark": "",
+      "light": ""
+    },
+    "mark": "",
+    "personName": "",
+    "communityLogo": "",
+    "cardTitle": "",
+    "bylinePerson": "",
+    "bylineLogo": "",
+    "button": "",
+    "perDay": "",
+    "captionFixes": []
+  },
+  "aerial_static": {
+    "_help": "motion-graphics/scripts/render_aerial.py: a static text block plus a lockup burned onto a clip. lockup_mark = square mark beside the wordmark. wordmark = the name as set in the lockup. wordmark_font / wordmark_variation = its font file and named variation (\"\" for a static font). tag_free / tag_paid = the line under the lockup. copy = {persona_key: [paragraph, ...]}. hooks = {persona_key: a replacement first paragraph} (builds <key>_v2). paid = {prefix: text put before paragraph 2, offer: the offer paragraph, close: the last line} (builds <key>_paid and <key>_paid_v2).",
+    "lockup_mark": "",
+    "wordmark": "",
+    "wordmark_font": "",
+    "wordmark_variation": "",
+    "tag_free": "",
+    "tag_paid": "",
+    "copy": {},
+    "hooks": {},
+    "paid": {
+      "prefix": "",
+      "offer": "",
+      "close": ""
+    }
+  },
+  "presenter": {
+    "_help": "Styling for the toolbox tools (compose_shots, type_overlay, doc_sweep, record_interaction, quote_card, redact). fonts = TTF/OTF files for heavy (pills), bold (captions), regular, light (number screens). colors = hex. presenter = the cutout's corner (left|right), width and bottom edge as shares of the frame per ratio, and px faded at its sides/bottom. safe_zone = where text may sit, shares of the frame per ratio. caption = size (share of width), stroke px, chunking (max_words, max_chars, hard_max_words, lines), replace = {\"spoken form\": \"written form\"} for captions only, weak_words a chunk never ends on. label/hook/name_card/number = sizes as shares of width. grade = still and clip look (contrast, saturation, lift 0-255, warm, grain sigma). audio = speed, voice_eq (ffmpeg filter), bed (path), bed_db, bed_end_lift (gain on the bed under the close), lufs, true_peak, sfx (false: no sound effects). export = x264 crf and rate cap.",
+    "fonts": {
+      "heavy": "",
+      "bold": "",
+      "regular": "",
+      "light": ""
+    },
+    "colors": {
+      "pill_bg": "#FFFFFF",
+      "pill_ink": "#000000",
+      "caption": "#FFFFFF",
+      "caption_stroke": "#000000",
+      "number": "#FFFFFF",
+      "shade": "#0A1628",
+      "scrim": "#191614",
+      "source_bg": "#000000",
+      "source_ink": "#FFFFFF",
+      "highlight": "#FFDE5C",
+      "endcard_box": "#FFFFFF",
+      "endcard_ink": "#111111",
+      "endcard_check": "#FFFFFF",
+      "viewer_bar": "#38383C",
+      "viewer_bg": "#262629",
+      "viewer_ink": "#ECECEE"
+    },
+    "presenter": {
+      "side": "left",
+      "width": {
+        "9x16": 0.4,
+        "4x5": 0.34
+      },
+      "bottom": {
+        "9x16": 0.78,
+        "4x5": 0.9
+      },
+      "edge_feather": [
+        70,
+        90
+      ]
+    },
+    "safe_zone": {
+      "9x16": {
+        "top": 0.151,
+        "bottom": 0.646,
+        "left": 0.056,
+        "right": 0.87
+      },
+      "4x5": {
+        "top": 0.06,
+        "bottom": 0.9,
+        "left": 0.04,
+        "right": 0.92
+      }
+    },
+    "caption": {
+      "size": 0.056,
+      "stroke": 3,
+      "max_words": 7,
+      "max_chars": 40,
+      "hard_max_words": 10,
+      "lines": 2,
+      "replace": {},
+      "weak_words": []
+    },
+    "label": {
+      "size": 0.06,
+      "radius": 15,
+      "pad": [
+        24,
+        15
+      ],
+      "uppercase": false
+    },
+    "hook": {
+      "size": 0.074,
+      "lines": 3
+    },
+    "name_card": {
+      "size": 0.064,
+      "sub_size": 0.034,
+      "seconds": 3.0
+    },
+    "number": {
+      "size": 0.27,
+      "label_size": 0.034,
+      "sub_size": 0.056,
+      "count_up": 0.35
+    },
+    "grade": {
+      "contrast": 1.05,
+      "saturation": 0.93,
+      "lift": 10,
+      "warm": 0.025,
+      "grain": 5.5
+    },
+    "audio": {
+      "speed": 1.0,
+      "voice_eq": "equalizer=f=250:t=q:w=1.0:g=-4,equalizer=f=4000:t=q:w=1.0:g=3",
+      "bed": "",
+      "bed_db": -17,
+      "bed_end_lift": 1.9,
+      "lufs": -14,
+      "true_peak": -1.0,
+      "sfx": false
+    },
+    "export": {
+      "crf": 21,
+      "maxrate": "4000k",
+      "bufsize": "8000k"
+    }
+  }
+}

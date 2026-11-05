@@ -1,0 +1,80 @@
+{
+  "_note": "From the guide's Writing Cinematic Ads chapter. Runs BEFORE lib/director.md, which assumes a finished script. A perfectly compliant prompt for a boring concept is still a boring ad.",
+  "hook": {
+    "shape": "A short 4-5 word phrase whose first words name the audience's pain.",
+    "goal": "The right viewer instantly feels 'this is about me'.",
+    "keyword_placement_score": {
+      "1st word": {
+        "score": "9-10/10",
+        "note": "strongest - they know immediately it is for them",
+        "examples": [
+          "Payroll is killing agencies.",
+          "Pests are already inside.",
+          "Back pain starts here."
+        ]
+      },
+      "2nd word": {
+        "score": "7-8/10",
+        "examples": [
+          "Your payroll is broken.",
+          "Your mattress hates your spine."
+        ]
+      },
+      "3rd word": {
+        "score": "5-6/10",
+        "examples": [
+          "Why your hiring fails.",
+          "Why your roaches return."
+        ]
+      },
+      "later": {
+        "score": "3-4/10",
+        "note": "weak unless the visual is extremely strong"
+      }
+    },
+    "formulas": [
+      "Pain keyword + emotional problem",
+      "Audience identity + painful truth",
+      "Problem + visual curiosity"
+    ],
+    "never": "Never open with a question. It reads as low authority and creates no curiosity. Use an assumed pain."
+  },
+  "first_3_seconds": {
+    "rule": "This is where people decide to stay or scroll. The visual must also stop them, not just the words.",
+    "test": "The visual should make the viewer ask 'what is happening here?'"
+  },
+  "retention": {
+    "setup_payoff": "The opening must create a question the ending answers. The first shot promises an ending.",
+    "dead_air": "Little to no dead air. Holding a reaction longer than 2 seconds with nothing else happening loses people.",
+    "every_second": "Each second moves via dialogue, reaction, camera movement, new visual detail, new problem, reveal, or payoff."
+  },
+  "structure": {
+    "pain_first": "Start with the problem, not the product. The solution can arrive mid-ad or at the CTA.",
+    "think_scene": "Ask 'what movie scene could represent this problem?' rather than 'how do I advertise this?'",
+    "no_camera_look": "Characters talk to each other inside the scene, never to camera.",
+    "dialogue": "Keep it short. Enough to understand the problem and stay curious. Not yappy.",
+    "humour": "Small, dry, awkward or situational. Even serious brands can use awkward silence, visual irony, or taking the problem too seriously."
+  },
+  "cta": {
+    "rule": "Curiosity, not explanation. Short, slightly vague, part of the scene.",
+    "examples": [
+      "Get it before the price goes up.",
+      "This is what fixed it.",
+      "Don't wait until it gets worse."
+    ],
+    "ending": "Satisfying but slightly abrupt. The viewer should feel 'that was complete, but I want to know more.'"
+  },
+  "final_checklist": [
+    "A clear pain point",
+    "A strong first 3 seconds",
+    "A visual that makes people curious",
+    "A hook with the keyword early",
+    "A scene that needs a payoff",
+    "Little to no dead air",
+    "A natural, curiosity-based CTA",
+    "A satisfying but slightly abrupt ending",
+    "Characters who talk to each other, not to camera",
+    "Humour, tension, awkwardness or curiosity so it does not feel boring",
+    "A concept that feels more like a movie scene than an ad"
+  ]
+}

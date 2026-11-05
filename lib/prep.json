@@ -1,0 +1,68 @@
+{
+  "_note": "Runs BEFORE lib/director.md Stage 1. director.md assumes character sheets already exist. This is how the guide makes them. The realism of the reference sets the ceiling on the realism of every clip.",
+  "character_sheet": {
+    "part_a": {
+      "what": "The starting portrait. Everything else is built on it.",
+      "model": "Nano Banana 2 or GPT Image 2. For vintage tones use GPT Image 2 - it is the only model that holds analog film tone.",
+      "aspect": "3:4 for Modern/Digital-IMAX. 16:9 for vintage tones (film is widescreen, so the training data matches).",
+      "routes": {
+        "existing_photo": "Have a real photo? Clean it up as the starting reference. Face clearly visible, sharp, forward-facing, high resolution.",
+        "describe": "No photo? Use the Part A portrait prompt in guide/blueprint-extract.txt and describe the face and outfit."
+      },
+      "reject_if": [
+        "looks like a render not a photograph",
+        "skin too smooth, no pores or imperfections",
+        "flat lighting with no natural depth",
+        "hair reads as a solid mass not strands",
+        "eyes lack iris detail or a catchlight"
+      ],
+      "note": "If it looks too smooth, too perfect, or too digital, regenerate. Everything downstream inherits this."
+    },
+    "part_b": {
+      "what": "The side profile.",
+      "model": "Nano Banana 2",
+      "aspect": "3:4 modern, 16:9 vintage",
+      "upload": "the Part A portrait",
+      "prompt": "Create a side view of the person.",
+      "check": "Same face, same hair, same grain and colour treatment as Part A. If tone fidelity drops, regenerate."
+    },
+    "part_c": {
+      "what": "Compile into the finished triptych.",
+      "model": "Nano Banana 2 - EXCEPT the A24 tone, which needs GPT Image 2. Nano Banana renders A24 technically clean but loses the muted palette and soft grain.",
+      "aspect": "1:1",
+      "upload": [
+        "Part A portrait",
+        "Part B side profile",
+        "a cropped outfit reference"
+      ],
+      "outfit_reference": "Best on a clean white background with nobody wearing it. If it is worn, crop the head out first.",
+      "panels": "Top left front face close-up, bottom left side face close-up, right tall panel full body in the outfit. Not three-quarter.",
+      "check": [
+        "identical character across all three panels",
+        "outfit matches the reference",
+        "background completely clean white",
+        "original face lighting preserved, not flattened",
+        "faces cropped tight with no remnant of the original outfit"
+      ]
+    },
+    "era_matching": {
+      "rule": "The character must belong to the era of the chosen visual tone.",
+      "why": "The models were trained on real films. A modern face, modern hair and modern styling dropped into an 80s tone is a contradiction the model cannot resolve cleanly.",
+      "also": "Cultural fit counts too, not only period."
+    },
+    "from_behind": "Never pass a face sheet on a from-behind shot. The model satisfies both constraints by rendering the face on a duplicate second person. Let wardrobe carry identity instead."
+  },
+  "product_sheet": {
+    "when": "Any physical product on screen - bottle, device, box, packaging.",
+    "skip_when": [
+      "software, app, SaaS, website - use a clean UI screenshot instead",
+      "you already have a clean real photo of the product - use it directly as the @"
+    ],
+    "model": "Nano Banana 2 or GPT Image 2",
+    "prompt_location": "guide/blueprint-extract.txt",
+    "check": "Colours, labels and materials match the real product. Regenerate if anything is off."
+  },
+  "location": {
+    "rule": "The location is NEVER a user question and never a written description at this stage. It is produced by director.md Stage 2 as base image, then wide shot, then location sheet - in that order, each from the previous one."
+  }
+}

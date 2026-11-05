@@ -1,0 +1,64 @@
+{
+  "_note": "Paste the string verbatim as the 'Visual tone:' line of every Seedance prompt and every Stage 2 base image prompt. NEVER use it in a Kling prompt - Kling takes its look from the uploaded images.",
+  "_example_image_dir": "guide/images",
+  "tones": {
+    "A": {
+      "name": "60s / 70s Italian Drama",
+      "example": "60s-70s-italian-drama-visual-tone-example.webp",
+      "character_example": "60s-70s-italian-drama-character-example.webp",
+      "compile_model": "nano-banana-2",
+      "string": "Visual tone: Shot on Arriflex 35 IIc, Cooke Speed Panchro 50mm, Technicolor film stock, style Italian drama, all'italiana 1965, warm saturated color palette, rich golden skin tones, analog film grain."
+    },
+    "B": {
+      "name": "80s American Drama",
+      "example": "80s-american-drama-visual-tone-example.webp",
+      "character_example": "80s-american-drama-character-example.webp",
+      "compile_model": "nano-banana-2",
+      "string": "Visual tone: Shot on Arriflex 35 BL4, Panavision anamorphic lens, Kodak 5294 film stock, 35mm, warm pushed exposure, slightly overexposed highlights, strong neon and practical light sources, deep saturated colors, teal shadows and warm amber highlights, soft halation around light sources, visible film grain, style 1980s American drama, Brian De Palma cinematography, Vilmos Zsigmond ASC, rich cinematic color grade. 80s settings."
+    },
+    "C": {
+      "name": "80s Summer Comedy",
+      "example": "80s-summer-comedy-visual-tone-example.webp",
+      "character_example": "80s-summer-comedy-character-example.webp",
+      "compile_model": "nano-banana-2",
+      "string": "Visual tone: Anamorphic 2.39:1, shallow depth of field, visible 35mm grain, subtle film halation on highlights, warm 3600K golden hour sunlight as key light, cool 5200K fluorescent fill light, soft pink neon practical spill light, Kodachrome palette, cherry reds, butter cream, denim blues, chrome silver, style Fast Times at Ridgemont High 1986."
+    },
+    "D": {
+      "name": "80s / 90s Hong Kong Cinema",
+      "example": "80s-90s-hong-kong-cinema-visual-tone-example.webp",
+      "character_example": "80s-90s-hong-kong-cinema-character-example.webp",
+      "compile_model": "nano-banana-2",
+      "string": "Visual tone: 35mm film photography, physical film defects, vintage film texture, subtle chromatic aberration, soft focus effect, slight light flickering, strong bloom on highlight surfaces, warm high-saturation color palette, retro film grain texture, slight Technicolor chromatic aberration, classic studio backdrop feel, soft stage lighting, style Shaw Brothers 80s-90s wuxia drama, early Hong Kong TVB aesthetic."
+    },
+    "E": {
+      "name": "90s Wong Kar-Wai Neon HK",
+      "example": "wong-kar-wai-inspired-visual-tone-example.webp",
+      "character_example": null,
+      "compile_model": "nano-banana-2",
+      "string": "Visual tone: Shot on Arriflex 35 BL, Kinoptik 9.8mm ultra wide prime, Fuji 500T pushed two stops, neon practical lights only, step printing motion blur, stuttered movement, deep saturated neon palette, cool blue shadows, warm amber skin tones, heavy film grain, cramped distorted wide angle framing, style Chungking Express 1994, Christopher Doyle cinematography. Movie scene. No gloss on skin, skin should look matte, textured with pores, no shine."
+    },
+    "F": {
+      "name": "90s American Drama",
+      "example": "90s-american-drama-visual-tone-example.webp",
+      "character_example": "90s-american-drama-character-example.webp",
+      "compile_model": "nano-banana-2",
+      "string": "Visual tone: Shot on Arriflex 35 BL4, Sphero anamorphic lens, Kodak Vision 5298 35mm film stock, slightly desaturated palette, cool blue and green shadow tones, warm skin highlights, soft natural diffused light, shallow depth of field, subtle lens breathing, visible film grain, cinematic 90s color grade. No gloss on skin, skin should look matte, textured with pores, no shine."
+    },
+    "G": {
+      "name": "Modern A24 / Indie Drama",
+      "example": "modern-a24-indie-drama-visual-tone-example.webp",
+      "character_example": "modern-a24-indie-drama-character-example.webp",
+      "compile_model": "gpt-image-2",
+      "compile_note": "A24 is the ONE exception. Nano Banana 2 renders it technically clean but loses the muted palette and soft grain. Compare guide/images/a24-character-sheet-compiled-in-gpt-image-2.webp against a24-character-sheet-compiled-in-nano-banana-2.webp.",
+      "string": "Visual tone: Shot on ARRI Alexa Mini LF, Cooke S4 prime lens 35mm, Kodak Vision3 250D film emulation, shallow depth of field, soft natural diffused light, muted desaturated palette, warm skin tones against cool environment, subtle film grain, gentle highlight rolloff, anamorphic 2.39:1, style A24 indie drama, Sayombhu Mukdeeprom cinematography, intimate emotional framing, cinematic color grade, natural imperfect lighting, visible texture on surfaces."
+    },
+    "H": {
+      "name": "Modern Digital / IMAX Cinematic",
+      "example": "modern-digital-imax-cinematic-visual-tone-example.webp",
+      "character_example": "modern-digital-imax-cinematic-character-example.webp",
+      "compile_model": "nano-banana-2",
+      "string": "Visual tone: Cinematic realist, simulating IMAX film camera, Panavision C series lens (35mm focal length, f4 aperture), wide aspect ratio. Low saturation, deep blue-black dominant tone, cold and desolate. Moderate film grain."
+    }
+  },
+  "_never_default": "director.md:105 bans defaulting to any style. There is no default tone. Always ask."
+}

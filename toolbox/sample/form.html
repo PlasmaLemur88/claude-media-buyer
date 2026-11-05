@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample search form</title>
+<style>
+  body { margin: 0; font: 17px system-ui, sans-serif; background: #f3f1ec; color: #1b1b1b; }
+  header { padding: 22px 20px 8px; font-weight: 800; font-size: 22px; }
+  .hero { padding: 10px 20px 20px; font-size: 30px; font-weight: 700; line-height: 1.15; }
+  form { margin: 0 20px; position: relative; }
+  input { width: 100%; box-sizing: border-box; font-size: 18px; padding: 16px 18px; border-radius: 14px; border: 2px solid #1b1b1b; background: #fff; }
+  ul { list-style: none; margin: 6px 0 0; padding: 0; background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+  li { padding: 14px 18px; border-bottom: 1px solid #eee; cursor: pointer; }
+  .card { margin: 22px 20px; padding: 20px; background: #fff; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.08); display: none; }
+  .card b { font-size: 26px; }
+</style></head>
+<body>
+<header>SAMPLE APP</header>
+<div class="hero">Type a place name to see a sample result card.</div>
+<form onsubmit="return false"><input id="q" placeholder="Search a sample place" autocomplete="off"><ul id="opts"></ul></form>
+<div class="card" id="card"><b id="title"></b><p>Sample result. Placeholder numbers: 0 rooms, 0 units. Nothing here is real.</p></div>
+<script>
+  const places = ["Example Park, Sampletown", "Example Point, Otherville", "Exampleton Road, Sampletown", "Placeholder Lane, Nowhere"];
+  const q = document.getElementById('q'), opts = document.getElementById('opts');
+  q.addEventListener('input', () => {
+    const v = q.value.toLowerCase(); opts.innerHTML = '';
+    if (v.length < 3) return;
+    for (const p of places.filter(p => p.toLowerCase().includes(v.slice(0, 4)))) {
+      const li = document.createElement('li'); li.setAttribute('role', 'option'); li.textContent = p;
+      li.onclick = () => { q.value = p; opts.innerHTML = ''; document.getElementById('title').textContent = p; document.getElementById('card').style.display = 'block'; };
+      opts.appendChild(li);
+    }
+  });
+</script>
+</body></html>

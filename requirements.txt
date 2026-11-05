@@ -1,0 +1,14 @@
+numpy>=1.24
+scipy>=1.10
+Pillow>=10.0
+openai-whisper>=20231117
+librosa>=0.10
+# talking_head.py and syncnet_qa.py (face tracking)
+opencv-python-headless>=4.8
+# widows.py (widow check on HTML stills); after install run: python3 -m playwright install chromium
+playwright>=1.40
+# Optional, heavy. matte.py (Robust Video Matting) needs torch; openai-whisper above already pulls torch in,
+# so this line only matters if whisper is dropped. Weights download on first matte.py run into tools/ (gitignored).
+# torch>=2.1
+# toolbox/vocals.py (vocal separation), optional
+# demucs>=4.0
