@@ -1,0 +1,263 @@
+{
+  "_help": "EXAMPLE BRAND. Glazeberry Clay Club is invented: the studio, its numbers, its prices and its five supplier partners do not exist. It is here so every format renders on a fresh copy of the engine and so you can see a filled-in brand.json. Every field is explained in brands/_template/brand.json. Copy this folder (or run brand.py new) for a real brand; never ship these values.",
+
+  "brand": {
+    "slug": "example",
+    "name": "Glazeberry Clay Club",
+    "written": "Always 'Glazeberry Clay Club' in full on screen; 'the studio' in running copy. Never 'GCC'.",
+    "what": "A pottery studio with a free weekly email, Glaze Notes (one fix every Sunday), and a paid studio membership: three live workshops a week and supplier discounts.",
+    "audience": "Adults who took up pottery in the last two years and keep hitting the same problems at home: cracks, drooping walls, runny glaze.",
+    "file_prefix": "GLAZE",
+    "output_root": ""
+  },
+
+  "claims": {
+    "_help": "Invented for the example. A real brand writes the source and date for each.",
+    "readers": "12,000 Glaze Notes readers. Source: invented for the example.",
+    "members": "600 studio members. Source: invented for the example.",
+    "price": "$180 a year. Source: invented for the example.",
+    "discounts": "$420 of supplier discounts from 5 suppliers. Source: invented for the example."
+  },
+
+  "never": [
+    "Never promise a result ('perfect pots in a week').",
+    "Never show a real person's face: the example has no people on camera.",
+    "Never call the workshops 'classes' or 'lessons'.",
+    "Never name a real clay, kiln or tool company. The five suppliers are invented."
+  ],
+
+  "people": {
+    "_help": "Nobody appears. The byline is always the mark ('logo')."
+  },
+
+  "offer": {
+    "free": {
+      "routes_to": "the Glaze Notes email signup",
+      "cta": "Get Glaze Notes",
+      "close": "Glazeberry Clay Club. 12,000 readers. Free every Sunday."
+    },
+    "paid": {
+      "routes_to": "the studio membership page",
+      "cta": "Join the studio",
+      "outro": "The newsletter is free. The studio is one hundred and eighty dollars a year. The supplier discounts alone are worth more. You get live workshops every week, help with your first firing, and a shelf in the members' kiln.",
+      "price": "$180 a year. 'Forty-nine cents a day' may sit beside it."
+    },
+    "one_place": "The offer lives in exactly one place. To change it, change it here and re-render."
+  },
+
+  "offer_numbers": {
+    "_help": "Invented for the example.",
+    "readers": "12,000",
+    "members": "600",
+    "total": 420,
+    "tools": 5,
+    "price": 180,
+    "currency": "$"
+  },
+
+  "what_works": {
+    "hook": "Name the problem the potter already has, as a statement: 'Your mugs keep cracking.'",
+    "shape": "Problem, the one fix, then the studio.",
+    "headline": "Literal: the workshop, the day, the price."
+  },
+
+  "judged_on": {
+    "metric": "Cost per new studio member."
+  },
+
+  "delivery": {
+    "ratios": "9:16 and 4:5, always both.",
+    "length": "Under 35 seconds."
+  },
+
+  "palettes": {
+    "dark": {
+      "bg": "#1B1714",
+      "ink": "#F6EFE6",
+      "accent": "#E0567F",
+      "muted": "#A89A8C",
+      "dim": "#3D342D",
+      "captionBg": "rgba(27,23,20,0.94)",
+      "wordmark": "assets/logos/glaze_notes_light.png",
+      "scrimTo": "linear-gradient(to bottom, rgba(27,23,20,0) 58%, rgba(27,23,20,0.97) 70%)",
+      "readOnLarge": ""
+    },
+    "paper": {
+      "bg": "#F6EFE6",
+      "ink": "#221C18",
+      "accent": "#B8365F",
+      "muted": "#6B5F55",
+      "dim": "#D8CCBF",
+      "captionBg": "#F6EFE6",
+      "wordmark": "assets/logos/glaze_notes_dark.png",
+      "scrimTo": "linear-gradient(to bottom, rgba(246,239,230,0) 56%, rgba(246,239,230,1) 68%)",
+      "readOnLarge": ""
+    }
+  },
+
+  "fonts": {
+    "_help": "One typeface everywhere: Montserrat (SIL Open Font License), shipped in assets/fonts/.",
+    "serif": "MontserratVar, Helvetica, Arial, sans-serif",
+    "sans": "MontserratVar, Helvetica, Arial, sans-serif",
+    "sansCards": "",
+    "files": [
+      { "family": "MontserratVar", "file": "assets/fonts/Montserrat-var.ttf", "weight": "100 900" }
+    ]
+  },
+
+  "end_card": {
+    "avatar": "assets/logos/mark.png",
+    "platformLabel": "Every Sunday in",
+    "freeSubline": "",
+    "paidSubline": "",
+    "cta": "",
+    "paidFollowOn": "Glaze Notes is free. The studio is",
+    "paidFollowOnAccent": "$180 a year.",
+    "offerEyebrow": "The studio"
+  },
+
+  "voice": {
+    "_help": "The samples were read by the macOS built-in voice Samantha (`say -v Samantha -r 185`), which costs nothing and is fine for a sample, not for an ad. For real ads pick an engine in scripts/voice.py.",
+    "engine": "",
+    "voice": "",
+    "style": "",
+    "speed": 1.0,
+    "say_as": {
+      "Glazeberry": "Glaze-berry"
+    }
+  },
+
+  "rsvp": {
+    "bg": "#120F0D"
+  },
+
+  "featured": [
+    { "name": "Kilnwise", "src": "assets/logos/kilnwise.png" },
+    { "name": "Oxbell Clay", "src": "assets/logos/oxbellclay.png" },
+    { "name": "Tidewheel", "src": "assets/logos/tidewheel.png" },
+    { "name": "Birchbat Tools", "src": "assets/logos/birchbattools.png" },
+    { "name": "Fernglaze", "src": "assets/logos/fernglaze.png" }
+  ],
+
+  "ledger": {
+    "freeLabel": "Free",
+    "freeRows": ["Glaze Notes", "Every Sunday", "Forever"],
+    "paidLabel": "Studio · paid",
+    "price": "$180 for the year.",
+    "priceCues": ["$180", "180"],
+    "worth": "The supplier discounts alone are worth more.",
+    "worthCue": "discounts",
+    "tools": [
+      { "name": "Kilnwise", "file": "assets/logos/kilnwise.png", "kind": "icon" },
+      { "name": "Oxbell", "file": "assets/logos/oxbellclay.png", "kind": "icon" },
+      { "name": "Tidewheel", "file": "assets/logos/tidewheel.png", "kind": "icon" }
+    ],
+    "more": "+ 2 more",
+    "extras": [
+      ["Live workshops every week", "live"],
+      ["Help with your first firing", "help"],
+      ["A shelf in the members' kiln", "shelf"]
+    ]
+  },
+
+  "aerial": {
+    "font": { "family": "MontserratVar", "file": "assets/fonts/Montserrat-var.ttf", "weight": "100 900" },
+    "markColor": "#B8365F",
+    "accent": "#B8365F",
+    "accentWord": "#FF9BB8",
+    "accentInk": "#fff",
+    "mark": "assets/logos/mark.png",
+    "personName": "",
+    "cobrandBy": "",
+    "platformWordmark": "assets/logos/glaze_notes_light.png",
+    "platformMark": "assets/logos/newsletter_mark.png",
+    "communityLogo": "assets/logos/studio_mark.png",
+    "hookLabel": "CLUB",
+    "wallThumbs": [
+      "assets/thumbs/t00.jpg", "assets/thumbs/t01.jpg", "assets/thumbs/t02.jpg",
+      "assets/thumbs/t03.jpg", "assets/thumbs/t04.jpg", "assets/thumbs/t05.jpg"
+    ],
+    "copy": {
+      "unit": "workshop",
+      "units": "workshops",
+      "communityLine": "Join the studio. 3 live {units} a week.",
+      "perDay": "That's {cents}¢ a day",
+      "coverPrice": "${price} a year",
+      "coverPerDay": "· {cents}¢ a day",
+      "button": "Join for ${price} a year",
+      "readersPill": "{readers} Glaze Notes readers",
+      "membersPill": "{members} studio members",
+      "readersChip": "{readers} readers",
+      "membersChip": "{members} members",
+      "newsletterTitle": "Glaze Notes",
+      "newsletterSub": "One fix every Sunday",
+      "freeBadge": "FREE",
+      "communityTitle": "Studio membership",
+      "cadence": "3 live {units} a week",
+      "rows": [
+        ["Monday", "wheel basics", "basics"],
+        ["Wednesday", "glazing", "glazing"],
+        ["Friday", "open throwing", "friday"]
+      ],
+      "dealsLine": "of supplier discounts, {tools} suppliers",
+      "wallCount": "100 videos",
+      "wallLength": "9 h 40 min",
+      "wallAnswer": "1 {unit} · 45 min"
+    },
+    "beats": [
+      { "beat": "identity", "any": ["readers"] },
+      { "beat": "bridge", "any": ["videos"], "starts": ["one", "live"] },
+      { "beat": "platform", "any": ["newsletter"] },
+      { "beat": "community", "any": ["studio", "wheel", "glazing", "friday"] },
+      { "beat": "deals", "any": ["{total}"], "starts": ["plus"] },
+      { "beat": "close", "any": ["join", "{price}", "cents"] }
+    ],
+    "cues": {
+      "hookShow": "two", "hookFade": "alone", "hookLight": "club",
+      "wall": ["videos"], "wallClear": "one",
+      "readers": "readers", "members": "members",
+      "platform": "newsletter", "free": "free",
+      "community": "studio", "cadence": "three",
+      "deals": "plus", "join": "join"
+    },
+    "keys": ["two", "club", "hundred", "one", "readers", "members", "free", "three",
+      "basics", "glazing", "friday", "{total}", "{price}", "49"]
+  },
+
+  "offer_card": {
+    "font": { "family": "MontserratVar", "file": "assets/fonts/Montserrat-var.ttf", "weight": "100 900" },
+    "accent": "#B8365F",
+    "captionAccent": "#FF9BB8",
+    "rowHighlight": "#FBEAF0",
+    "shine": { "dark": "#FFD3E0", "light": "#B8365F" },
+    "mark": "assets/logos/mark.png",
+    "personName": "",
+    "communityLogo": "assets/logos/studio_mark.png",
+    "cardTitle": "Inside the studio",
+    "bylinePerson": "",
+    "bylineLogo": "{readers} readers",
+    "button": "Join for ${price} a year",
+    "perDay": "That's {cents}¢ a day",
+    "captionFixes": [["^Glaz[a-z]*berry", "i", "Glazeberry"]]
+  },
+
+  "aerial_static": {
+    "lockup_mark": "assets/logos/mark.png",
+    "wordmark": "Glazeberry Clay Club",
+    "wordmark_font": "assets/fonts/Montserrat-var.ttf",
+    "wordmark_variation": "ExtraBold",
+    "tag_free": "Glaze Notes, free every Sunday",
+    "tag_paid": "Free email · Paid studio",
+    "copy": {
+      "beginner": ["For anyone whose first mugs keep cracking in the kiln.", "Every Sunday: one fix, shown step by step.", "Get Glaze Notes, free."]
+    },
+    "hooks": {
+      "beginner": "Your mugs keep cracking. It is not your hands."
+    },
+    "paid": {
+      "prefix": "The email is free. ",
+      "offer": "Members get three live workshops a week and supplier discounts.",
+      "close": "Join the studio."
+    }
+  }
+}

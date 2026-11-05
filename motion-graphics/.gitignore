@@ -1,0 +1,8 @@
+.env
+.venv/
+node_modules/
+ads/**/*.mp4
+# audio is generated or belongs to a brand; the bed comes from scripts/bed.py
+public/audio/*.wav
+out/
+.ads.tmp

@@ -1,0 +1,55 @@
+{
+ "paths": {
+  "work": "tests/_tmp",
+  "clip": "tests/fixtures/clips/{name}.mp4",
+  "still": "tests/fixtures/clips/{name}.jpg",
+  "caption_font": "/System/Library/Fonts/SFNS.ttf"
+ },
+ "music": {
+  "bed": null,
+  "stop_index": null
+ },
+ "card": {
+  "duration": 0
+ },
+ "cuts": [
+  {
+   "clip": "a",
+   "in": 0.2,
+   "dur": 2.2,
+   "lead": 0.0,
+   "tail": 0.25,
+   "caps": [
+    [
+     "WHAT AI",
+     0.0,
+     1.2
+    ]
+   ]
+  },
+  {
+   "clip": "b",
+   "in": 0.3,
+   "dur": 2.0,
+   "lead": 0.0,
+   "tail": 0.25,
+   "caps": [
+    [
+     "IS DOING ALL THIS WORK",
+     0.0,
+     1.6
+    ]
+   ]
+  }
+ ],
+ "outputs": {
+  "master": "tests/_tmp/out_9x16.mp4",
+  "ratios": [
+   {
+    "file": "tests/_tmp/out_4x5.mp4",
+    "crop": "crop=1080:1350:0:285",
+    "crf": 18
+   }
+  ]
+ }
+}

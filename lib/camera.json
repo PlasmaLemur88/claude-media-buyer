@@ -1,0 +1,288 @@
+{
+  "_rule": "Copy these strings EXACTLY. Never paraphrase, reword, shorten, or improvise camera language. The test: does this exact string exist below? If it is your own wording, delete it and paste the library string. Applies equally to Stage 2 base image prompts, Stage 3 Kling shot boxes, and Stage 4 Seedance shot lists.",
+  "_variation_rule": "Never repeat the same camera angle or shot size as the shot immediately before it. Close Up, Medium Shot, Close Up is valid. Close Up, Close Up is never valid. This holds even on 'minimal switching' - that setting changes how OFTEN you cut, not whether the angle changes when you do.",
+  "_example_image_dir": "guide/images",
+  "shot_size": [
+    {
+      "name": "Establishing Shot",
+      "string": "Establishing Shot",
+      "image": "establishing-shot.webp",
+      "use_when": "The scene is about the full place, geography, or where everybody is positioned."
+    },
+    {
+      "name": "Extreme Wide Shot",
+      "string": "Wide shot of subject while showing the entire location in the frame.",
+      "image": "extreme-wide-shot.webp",
+      "use_when": "Showing body language against a big location."
+    },
+    {
+      "name": "Wide Shot",
+      "string": "Wide Shot",
+      "image": "wide-shot.webp",
+      "use_when": "The subject matters but the environment still needs to be seen."
+    },
+    {
+      "name": "Medium Shot",
+      "string": "Medium Shot",
+      "image": "medium-shot.webp",
+      "use_when": "Performance, dialogue, body language, readable emotion."
+    },
+    {
+      "name": "Extreme Close Up",
+      "string": "Extreme Close Up of..",
+      "image": "extreme-close-up.webp",
+      "use_when": "What the subject feels internally, not what they do physically."
+    },
+    {
+      "name": "Close Up",
+      "string": "Close Up",
+      "image": "close-up.webp",
+      "use_when": "Face, emotion, reaction, or one important detail."
+    },
+    {
+      "name": "Detail Shot",
+      "string": "Detail Shot of..",
+      "image": "detail-shot.webp",
+      "use_when": "A small object, body part, clue, screen, hand, or action detail."
+    }
+  ],
+  "angle": [
+    {
+      "name": "Eye Level",
+      "string": "Eye Level",
+      "image": "eye-level.webp",
+      "use_when": "Natural, neutral, human."
+    },
+    {
+      "name": "Medium Low Angle",
+      "string": "Low Angle, Camera looking up at the subject",
+      "image": "medium-low-angle.webp",
+      "use_when": "The subject should feel powerful, threatening, heroic, or dominant."
+    },
+    {
+      "name": "High Angle Top Down View",
+      "string": "High Angle Top Down View",
+      "image": "high-angle-top-down-view.webp",
+      "use_when": "Looking down on the scene, seeing placement clearly."
+    },
+    {
+      "name": "High Angle Top Down Foreshortening",
+      "string": "High Angle Top down view, exaggerated foreshortening, head appears big in the foreground torso in the mid ground medium size, waist shrinks down the body in the background",
+      "image": "high-angle-top-down-foreshortening.webp",
+      "use_when": "Stylized top-down body distortion."
+    },
+    {
+      "name": "Low Angle Foreshortening (1/5)",
+      "string": "Focus distance: Extremely close, focused on foreground",
+      "image": "low-angle-foreshortening.webp",
+      "use_when": "Strong low-angle body distortion from the ground upward."
+    },
+    {
+      "name": "Low Angle Foreshortening (2/5)",
+      "string": "Camera angle relative to subject: Extreme low angle, worm's-eye view looking straight up",
+      "image": "low-angle-foreshortening.webp",
+      "use_when": "part of the Low Angle Foreshortening block - paste all five lines together"
+    },
+    {
+      "name": "Low Angle Foreshortening (3/5)",
+      "string": "Full-body wide-angle perspective distortion shot",
+      "image": "low-angle-foreshortening.webp",
+      "use_when": "part of the Low Angle Foreshortening block - paste all five lines together"
+    },
+    {
+      "name": "Low Angle Foreshortening (4/5)",
+      "string": "Head, Torso, Bottom size as they appear in the frame: Head is positioned at the top center and appears small; Torso is positioned in the middle center and appears medium; Bottom and feet are positioned at the bottom center, occupying the lower half, appearing extremely large",
+      "image": "low-angle-foreshortening.webp",
+      "use_when": "part of the Low Angle Foreshortening block - paste all five lines together"
+    },
+    {
+      "name": "Low Angle Foreshortening (5/5)",
+      "string": "Subject Foreshortening: Highly exaggerated; feet are closest to the camera, legs extend into the midground, torso and head are furthest away",
+      "image": "low-angle-foreshortening.webp",
+      "use_when": "part of the Low Angle Foreshortening block - paste all five lines together"
+    },
+    {
+      "name": "High Angle Top Down Drone Shot",
+      "string": "High Angle Top down Drone Shot, the entire location is visible in the frame, subject appear small in the frame",
+      "image": "high-angle-top-down-drone-shot.webp",
+      "use_when": "The entire location or area must be visible."
+    },
+    {
+      "name": "POV shot",
+      "string": "POV shot. Only hands are visible",
+      "image": "pov-shot.webp",
+      "use_when": "Immersion, fear, discovery, object interaction."
+    },
+    {
+      "name": "Dutch Angle",
+      "string": "Dutch angle shot, camera tilted diagonally, horizon line slanted, subject framed off-balance",
+      "image": "dutch-angle-dutch-shot.webp",
+      "use_when": "Unstable, wrong, threatening, surreal, emotionally disturbed."
+    }
+  ],
+  "character_view": [
+    {
+      "name": "Front View",
+      "string": "Front view",
+      "image": "front-view.webp"
+    },
+    {
+      "name": "Side Profile",
+      "string": "side profile",
+      "image": "side-profile.webp"
+    },
+    {
+      "name": "3/4 View",
+      "string": "3/4 view",
+      "image": "3-4-view.webp"
+    },
+    {
+      "name": "3/4 Back",
+      "string": "3/4 back is visible",
+      "image": "3-4-back.webp"
+    },
+    {
+      "name": "Rear Back View",
+      "string": "rear back view, back is visible",
+      "image": "rear-back-view.webp"
+    }
+  ],
+  "blocking": [
+    {
+      "name": "Over the Shoulder",
+      "string": "Over the shoulder shot of character [Subject X], back is visible, in front of them is [Subject X]",
+      "image": "over-the-shoulder.webp"
+    },
+    {
+      "name": "Over the Hip",
+      "string": "Over the hip shot of character [Subject X], back is visible, in front of them is [Subject X]",
+      "image": "over-the-hip.webp",
+      "use_when": "Body movement, hands, objects, weapons, walking, tension, revealing something lower in frame."
+    },
+    {
+      "name": "Triangle - 2 Foreground, 1 Background",
+      "string": "Triangle shot of [Subject 1] and [Subject 2] in the foreground, backs are visible. In front of them is [Subject 3] [Subject 3's Character view]",
+      "image": "triangle-shot-2-foreground-1-background.webp"
+    },
+    {
+      "name": "Triangle - 1 Foreground, 2 Background",
+      "string": "Triangle shot of [Subject 1] in the foreground, backs is visible, in front of them is [Subject 2] [Subject 2's Character view] and [Subject 2] [Subject 2's Character view]",
+      "image": "triangle-shot-1-foreground-2-background.webp"
+    },
+    {
+      "name": "Face to Face",
+      "string": "Face to Face side profile views",
+      "image": "face-to-face.webp"
+    },
+    {
+      "name": "Back to Back",
+      "string": "Back to Back side profiles",
+      "image": "back-to-back.webp"
+    }
+  ],
+  "composition": [
+    {
+      "name": "Symmetrical",
+      "string": "Symmetrical Composition",
+      "image": "symmetrical-composition.webp"
+    },
+    {
+      "name": "Leading Lines",
+      "string": "Leading Lines",
+      "image": "leading-lines.webp"
+    },
+    {
+      "name": "Separated by Distance",
+      "string": "Subjects Separated by Distance",
+      "image": "subjects-separated-by-distance.webp"
+    },
+    {
+      "name": "Side by Side",
+      "string": "side by side",
+      "image": "side-by-side.webp"
+    },
+    {
+      "name": "Vanishing Point",
+      "string": "vanishing point",
+      "image": "vanishing-point.webp"
+    }
+  ],
+  "movement": [
+    {
+      "name": "Circles Right/Left",
+      "string": "Circles to the Right / Left"
+    },
+    {
+      "name": "Circles Up/Down",
+      "string": "Circles Up / Down"
+    },
+    {
+      "name": "Rotate",
+      "string": "Camera Rotates"
+    },
+    {
+      "name": "Tilt",
+      "string": "Camera Pans Down / Up"
+    },
+    {
+      "name": "Pan",
+      "string": "Camera Pans Right / Left"
+    },
+    {
+      "name": "Push In",
+      "string": "Camera Pushes In"
+    },
+    {
+      "name": "Pull Back",
+      "string": "Camera Pulls Back"
+    },
+    {
+      "name": "Handheld",
+      "string": "Handheld Shaky Camera"
+    },
+    {
+      "name": "Static",
+      "string": "Static Shot"
+    }
+  ],
+  "_slash_rule": "For a slash pair like 'Camera Pans Down / Up', use only the direction the shot needs. For blocking strings with [Subject X] placeholders, fill the names and keep every other word identical.",
+  "camera_feel": {
+    "_note": "Seedance header 'Camera feel:' line. The VALUE is the exact library movement string.",
+    "handheld": "Handheld Shaky Camera",
+    "static": "Static Shot",
+    "mix_rule": "Handheld for tense, emotional or action-driven generations. Static for product reveals, composed emotional close-ups, deliberate framing."
+  },
+  "seedance_always_include": [
+    "NO MUSIC, only natural ambient sounds.",
+    "No texts or subtitles on screen."
+  ],
+  "kling_boilerplate": {
+    "global_setup": {
+      "handheld": "Handheld camera throughout. No music, only SFX and natural ambience.",
+      "static": "Static camera throughout. No music, only SFX and natural ambience."
+    },
+    "start_frame": "Use start frame @",
+    "ending": "The subject stops talking, silence in the room."
+  },
+  "_ip_rule": "director.md bans referencing existing IP anywhere in any prompt, but the mandated verbatim tone strings name films and cinematographers. The Visual tone line is the one exemption. Any IP check must skip it.",
+  "_guide_extras": {
+    "_note": "From the guide's Camera Work chapter, NOT from the director instruction's camera language library. The director names six categories that require an exact library string and subject placement is not among them. Use these as framing vocabulary when composing a base image; do not treat them as sanctioned library strings and do not rely on them to satisfy the exact-camera-string rule.",
+    "subject_placement": [
+      {
+        "name": "Centered",
+        "string": "Subject Centered in Frame",
+        "image": "subject-centered-in-frame.webp"
+      },
+      {
+        "name": "Right Third",
+        "string": "Subject on Right Third",
+        "image": "subject-on-right-third.webp"
+      },
+      {
+        "name": "Left Third",
+        "string": "Subject on Left Third",
+        "image": "subject-on-left-third.webp"
+      }
+    ]
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "_note": "director.md PROMPT DURATION RULE. Duration is chosen FROM the dialogue word count, never from a target runtime. Count the words first, then pick the duration.",
+  "_test": "words / 35 * 15 = the maximum honest duration in seconds. Longer than that is padded.",
+  "_floor": "A Seedance BLOCK has a 4s minimum and 15s maximum. Individual shots inside it have no minimum and can be 0.5s.",
+  "seconds_to_words": {
+    "4": {
+      "min_words": 9,
+      "max_words": 12
+    },
+    "5": {
+      "min_words": 12,
+      "max_words": 15
+    },
+    "6": {
+      "min_words": 14,
+      "max_words": 18
+    },
+    "7": {
+      "min_words": 16,
+      "max_words": 21
+    },
+    "8": {
+      "min_words": 19,
+      "max_words": 24
+    },
+    "9": {
+      "min_words": 21,
+      "max_words": 27
+    },
+    "10": {
+      "min_words": 23,
+      "max_words": 30
+    },
+    "11": {
+      "min_words": 26,
+      "max_words": 33
+    },
+    "12": {
+      "min_words": 28,
+      "max_words": 36
+    },
+    "13": {
+      "min_words": 30,
+      "max_words": 39
+    },
+    "14": {
+      "min_words": 33,
+      "max_words": 42
+    },
+    "15": {
+      "min_words": 35,
+      "max_words": 45
+    }
+  },
+  "pacing": {
+    "fast": {
+      "dialogue": "strictly sized to word count, no breathing room",
+      "action_shot_s": [
+        1,
+        3
+      ],
+      "end_card_s": null
+    },
+    "medium": {
+      "dialogue": "word count + 1 to 2s breathing room per shot",
+      "action_shot_s": [
+        2,
+        4
+      ],
+      "emotional_beat_extra_s": [
+        1,
+        2
+      ],
+      "end_card_s": [
+        3,
+        5
+      ]
+    },
+    "slow": {
+      "dialogue": "word count + 2 to 4s breathing room per shot",
+      "action_shot_s": [
+        4,
+        8
+      ],
+      "emotional_beat_extra_s": [
+        3,
+        5
+      ],
+      "end_card_s": [
+        5,
+        8
+      ]
+    }
+  },
+  "_action_rule": "Before writing every shot ask: does it contain dialogue? If yes use the word-count scale plus that pacing's breathing room. If no use that pacing's action range. Never apply the word-count scale to a dialogue-free shot."
+}

@@ -1,0 +1,22 @@
+{
+  "name": "video-ads",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "studio": "test -s ../.current_brand || { echo 'no active brand: run python3 scripts/brand.py use <slug>'; exit 1; } && remotion studio",
+    "render": "test -s ../.current_brand || { echo 'no active brand: run python3 scripts/brand.py use <slug>'; exit 1; } && remotion render",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/bundler": "^4.0.500",
+    "@remotion/cli": "^4.0.500",
+    "@remotion/renderer": "^4.0.500",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "remotion": "^4.0.500"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "typescript": "^5.9.3"
+  }
+}

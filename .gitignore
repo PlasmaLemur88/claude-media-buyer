@@ -1,0 +1,55 @@
+# keys — never commit
+.env
+.env.*
+!.env.example
+# generated + intermediates
+projects/*/gen/
+projects/*/tmp/
+projects/*/takes/
+projects/*/out/
+__pycache__/
+*.pyc
+.DS_Store
+# finished cuts ship to Drive, not git
+projects/*/final/*.mp4
+.current_project
+lib/_*.json
+/audio/
+# a project is one operator's working state - never ship it
+projects/*
+!projects/.gitkeep
+
+# local model checkouts (SyncNet)
+tools/
+tmp/
+node_modules/
+motion-graphics/out/
+# the active brand: written by scripts/brand.py use <slug>, per machine
+.current_brand
+.say_as.active.json
+motion-graphics/src/brand.active.json
+motion-graphics/src/configs.active.mjs
+motion-graphics/public/brand-active/
+
+# one operator's campaign state - never ship it
+ads/CAMPAIGN.md
+ads/LOG.md
+ads/REPORT-*.md
+ads/REPORT-*.html
+ads/BRIEF.md
+ads/RESEARCH.md
+ads/ANGLES.md
+ads/TEST-PLAN.md
+ads/briefs/*
+!ads/briefs/.gitkeep
+ads/DELIVERED.md
+ads/LEARNINGS.md
+ads/checks/*
+!ads/checks/.gitkeep
+ads/today.json
+ads/takeover.json
+
+# review packs and verdicts, per render
+review/
+ads/today.json
+ads/takeover.json
