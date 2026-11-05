@@ -24,7 +24,7 @@ and says what each missing piece costs you.
    tools the ads part never needs (anything that changes targeting or an ad set, deletes,
    duplicates, or touches audiences, rules, catalogs, posts or account slots) and Meta's
    own connector, and it makes the build-time writes (a new campaign, a new ad set, a new
-   Meta rule) ask first, so they only happen while you watch. The guard is keyed to a server
+   Meta rule, a video from a link) ask first, so they only happen while you watch. The guard is keyed to a server
    named pipeboard, as the command above names it; under another name the check-in reports
    and changes nothing.
 

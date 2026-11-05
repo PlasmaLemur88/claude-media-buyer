@@ -221,8 +221,9 @@ sign-ins. `ads/LOG.md` is the memory every run appends to.
 - **"Make them"**: run `ads/PRODUCTION.md` on the briefed queue. **"Weekly review"**:
   run `ads/WEEKLY.md` now. **"Write the campaign report"**: run `ads/REPORT.md` now.
 - **Replies to a report, typed in any chat**: "do it <numbers> @<time>", "show <n>",
-  "undo <n>", "pause <ad name>", "pause the campaign", "resume the campaign", "raise
-  total to <X>", "raise ceiling to <X>", "set ceiling to <X>" and "the cut is good" all
+  "undo <n>", "pause <ad name>", "resume <ad name>", "pause the campaign", "resume the
+  campaign", "raise total to <X>", "raise ceiling to <X>", "set ceiling to <X>", "raise cap to
+  <X>", "set end date to <date>", "show all", "show learnings" and "the cut is good" all
   go through `ads/CHECKIN.md` STEP 6, which reads the newest Check-in entry in
   `ads/LOG.md` first.
 - **"Launch it"** typed in any chat: find every "Built video ... waiting for your

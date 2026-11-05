@@ -234,5 +234,23 @@ with tempfile.TemporaryDirectory() as d:
     r = subprocess.run([sys.executable, str(ROOT / "ads" / "rules.py"), "--plan", str(pl), "--today", str(PL.Path(d) / "today.json"), "--log", str(lg), "--actions", str(PL.Path(d) / "a.jsonl")], capture_output=True, text=True)
     check("a first run with no today.json still answers", r.returncode == 0 and '"mode"' in r.stdout)
 
+# --- the third review
+o = R.decide(dict(p, daily_ceiling="1500"), dict(base, current_daily_budget=3000, daily=days(3000, 2400), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("a ceiling lowered below the budget cuts to it", o["budget"] and o["budget"]["to"] == 1500)
+o = R.decide({"budget_policy": "fixed", "target_cost_per_result": "1.50", "total_budget": "10000", "end_date": "2026-11-20"},
+             dict(base, current_daily_budget=1500, spend_to_date=6000, daily=days(1500, 1200), ads=ads((3000, 2000), (2000, 1500))), {"budget": 1, "copy": 0, "video": 0})
+check("the pacing cut respects one change a day", o["budget"] is None)
+o = R.takeover(dict(T0, campaigns=[camp(learning="FAIL")]))
+check("learning FAIL reads as learning limited", o["campaigns"][0]["outcome"] == "refresh")
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "1.50"}, dict(base, spend_cap=31000, spend_lifetime=28500, daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("a nearly spent Meta cap asks and offers the extension", o["cap_to"] == 59500 and any("spend cap" in q for q in o["ask"]))
+o = R.decide({"budget_policy": "fixed", "target_cost_per_result": "1.50", "total_budget": "10000", "end_date": "2026-11-20"}, dict(base, spend_cap=10000, spend_lifetime=9500, daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("a fixed campaign never extends its cap", o["cap_to"] is None)
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "1.50", "pause_multiplier": "-2", "scale_step_pct": "75"}, dict(base, daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("bad multiplier and step are named", any("pause_multiplier" in n for n in o["notes"]) and any("scale_step_pct" in n for n in o["notes"]))
+with tempfile.TemporaryDirectory() as d:
+    lg = PL.Path(d) / "LOG.md"; lg.write_text("# Campaign log\n## 2026-11-12 09:00 Campaign built\nthe video ads and ids\n")
+    check("a Campaign built entry is not the day's video", R.log_today(lg, "2026-11-12")["video"] == 0)
+
 print(f"\n  {run - fails} passed, {fails} failed")
 sys.exit(1 if fails else 0)

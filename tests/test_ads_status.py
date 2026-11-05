@@ -41,7 +41,9 @@ with tempfile.TemporaryDirectory() as d:
     (root / "ads" / "checks" / "tracking.md").write_text("PASS\n")
     (root / "ads" / "CAMPAIGN.md").write_text("campaign_id: 1\nbudget_policy: fixed\nmode: approval\n")
     check("launch check line reads as the docs quote it", run(root, cfg) == "Stage 4 of 4, Buying. Step 4 of 9: Launch check.")
-    (root / "ads" / "checks" / "launch.md").write_text("PASS\n"); (root / "ads" / "LOG.md").write_text("## 2026-11-05 10:00 Turned on\n")
+    (root / "ads" / "checks" / "launch.md").write_text("PASS\n"); (root / "ads" / "LOG.md").write_text("# Campaign log\nEach entry: ## <date> <type>. Types: Campaign built, Turned on, Check-in.\n## 2026-11-05 09:00 Campaign built\nids\n")
+    check("the log header alone is not a turn-on", "Step 5 of 9: Turned on" in run(root, cfg))
+    (root / "ads" / "LOG.md").write_text("# Campaign log\nTypes: Turned on.\n## 2026-11-05 10:00 Turned on\n")
     check("turned on moves to scheduling", "Step 6 of 9: Twice-daily check-in scheduled" in run(root, cfg))
     (root / "ads" / "CAMPAIGN.md").write_text("campaign_id: 1\nbudget_policy: scale\nmode: approval\n")
     check("always-on budget has no final report step", "of 8:" in run(root, cfg))
@@ -53,4 +55,4 @@ with tempfile.TemporaryDirectory() as d:
     (root / "ads" / "REPORT-2026-11-30.md").write_text("early report\n")
     check("a mid-campaign report does not end the campaign", not run(root, cfg).startswith("Campaign ended"))
 
-print(f"\n  {17 - fails} passed, {fails} failed"); sys.exit(1 if fails else 0)
+print(f"\n  {18 - fails} passed, {fails} failed"); sys.exit(1 if fails else 0)
