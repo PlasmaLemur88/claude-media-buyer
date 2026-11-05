@@ -4,9 +4,9 @@ You run as a scheduled task with no memory of earlier chats. Every path below is
 
 STEP 0. Call get_ad_accounts. If the Pipeboard tools are missing or return an auth or token error, post (Slack if set up, and the chat): "Could not reach Pipeboard, so the spend alert did not run. Open Claude Code in this folder, type /mcp, and reconnect pipeboard." at most once a day, log it, and stop.
 
-STEP 1. Read the campaign_id and optimization_event from `ads/CAMPAIGN.md`. If the file is missing, call get_campaigns and use every ACTIVE campaign whose name starts with "CLAUDE |". If there is none, stop without posting.
+STEP 1. Read the campaign_id and optimization_event from `ads/CAMPAIGN.md`. If the file is missing, stop without posting; the check-in says what to do.
 
-STEP 2. For each, read the daily budget from get_campaign_details and call get_insights at the ad level for today (time_range "today", which Meta reads in the account time zone; use account_timezone from `ads/CAMPAIGN.md` for the date in your message) with ad_name, spend and actions. The result is the optimization_event in `ads/CAMPAIGN.md`, read under `result_action_type` from the same file. Amounts come in minor units; divide by currency_offset from that file.
+STEP 2. For each, read the daily budget from get_campaign_details and call get_insights at the ad level for today (time_range "today", which Meta reads in the account time zone; use account_timezone from `ads/CAMPAIGN.md` for the date in your message) with ad_name, spend and actions. The result is the optimization_event in `ads/CAMPAIGN.md`, read under `result_action_type` from the same file. Insights spend is already in whole units; only budgets from campaign reads are minor units (divide by currency_offset).
 
 STEP 3. Read target_cost_per_result and pause_multiplier (default 3) from `ads/CAMPAIGN.md`. Flag only when one of these is true:
 - With a target: an ad has spent more than pause_multiplier times the target today with no result today, or the campaign has spent more than twice the target today with no result today.

@@ -48,6 +48,8 @@ ads/checks/*
 !ads/checks/.gitkeep
 ads/today.json
 ads/takeover.json
+ads/actions.jsonl
+ads/archive/
 
 # review packs and verdicts, per render
 review/

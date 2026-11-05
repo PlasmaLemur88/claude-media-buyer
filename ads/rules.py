@@ -21,10 +21,14 @@ The check-in writes ads/today.json from Pipeboard first:
     "date": "2026-11-12",                    # today, in the ad account's time zone
     "current_daily_budget": 1000,
     "spend_to_date": 3000,
-    "daily": [ {"date": "2026-11-11", "spend": 1000, "results": 640}, ... up to 7 days, oldest first ],
-    "ads": [ {"id": "1", "name": "...", "status": "ACTIVE", "spend_7d": 340, "results_7d": 0, "days_running": 5,
-              "frequency_7d": 2.1, "ctr_7d": 1.4, "ctr_first_3d": 1.9}, ... ]
+    "daily": [ {"date": "2026-11-11", "spend": 1000, "results": 640, "value": 0}, ... the 7 full days before today, oldest first ],
+    "ads": [ {"id": "1", "name": "...", "status": "ACTIVE", "spend_7d": 340, "results_7d": 0, "value_7d": 0, "days_running": 5,
+              "frequency_7d": 2.1, "ctr_7d": 1.4, "ctr_first_3d": 1.9}, ... ],
+    "meta_rules_live": ["120255000000001"]      # the Meta rule ids that still exist, from get_ad_rules
   }
+  spend_to_date runs from start_date through yesterday. Insights spend is whole currency units
+  as Meta returns it; only budgets and caps from campaign reads are minor units. "value" is the
+  purchase value under result_action_type and matters only when the plan has target_roas.
 
 It prints JSON: what to pause, the one budget change (already capped), which ads
 are tiring (refresh), the mode (autopilot only when autopilot_accepted is the date plus
@@ -45,17 +49,29 @@ HERE = pathlib.Path(__file__).resolve().parent
 
 def num(v, default=None):
     try:
-        return float(str(v).replace("$", "").replace(",", ""))
+        f = float(str(v).replace("$", "").replace(",", ""))
     except (TypeError, ValueError):
         return default
+    return f if f == f and abs(f) != float("inf") else default
+
+
+ENUM_KEYS = ("budget_policy", "mode", "autopilot_video", "takeover", "lead_source")
+MONEY_KEYS = ("target_cost_per_result", "daily_budget", "total_budget", "daily_ceiling", "autopilot_credit_limit_per_day")
 
 
 def read_plan(p):
-    plan = {}
+    """ads/CAMPAIGN.md as a dict. A key written twice is an error: the last one would win silently."""
+    plan, seen, dups = {}, set(), []
     for line in p.read_text().splitlines():
         m = re.match(r"\s*([a-z_]+):\s*(.*)$", line)
         if m:
-            plan[m.group(1)] = m.group(2).strip()
+            k, v = m.group(1), m.group(2).strip()
+            if k in seen:
+                dups.append(k)
+            seen.add(k)
+            plan[k] = v.lower() if k in ENUM_KEYS else v
+    if dups:
+        raise ValueError(f"ads/CAMPAIGN.md repeats {', '.join(sorted(set(dups)))}; keep one line per field")
     return plan
 
 
@@ -69,7 +85,7 @@ def log_today(p, date, actions=None):
                 continue
             head = b.splitlines()[0].lower()
             body = b.lower()
-            if "budget" in head or (("changed" in head or "approved" in head) and re.search(r"budget[^\n]*(->|to [$€£¥₩₹0-9])", body)):
+            if "budget" in head or (("changed" in head or "approved" in head) and re.search(r"daily[ _]?budget[^\n]*(->|to [$€£¥₩₹0-9])", body)):
                 counts["budget"] += 1
             if "built" in head:
                 if "copy" in head or ("video" not in head and "copy variant" in body):
@@ -82,7 +98,9 @@ def log_today(p, date, actions=None):
                 j = json.loads(line)
             except ValueError:
                 continue
-            if str(j.get("date")) == date and j.get("kind") in counts:
+            if not isinstance(j, dict):
+                continue
+            if str(j.get("date", ""))[:10] == str(date)[:10] and j.get("kind") in counts:
                 counts[j["kind"]] += 1
     return counts
 
@@ -99,18 +117,29 @@ def money(plan):
 
 def decide(plan, today, logc):
     out = {"pauses": [], "budget": None, "refresh": [], "ask": [], "notes": [], "mode": "approval", "credit_limit": 0,
-           "autopilot_today": {"copy_variant": False, "video": False, "budget_change": False}}
+           "pause_campaign": False, "autopilot_today": {"copy_variant": False, "video": False, "budget_change": False}}
     fmt = money(plan)
-    policy = plan.get("budget_policy", "fixed")
-    if plan.get("mode") == "autopilot":
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(today.get("date", ""))):
+        raise ValueError(f"today.json date must be YYYY-MM-DD, got {today.get('date')!r}")
+    policy = (plan.get("budget_policy") or "fixed").strip().lower()
+    for k in MONEY_KEYS:
+        raw = (plan.get(k) or "").strip().lower()
+        if raw and raw not in ("none", "never", "no") and num(raw) is None:
+            out["notes"].append(f"{k} '{plan.get(k)}' is not a number; treated as none")
+    if (plan.get("mode") or "").strip().lower() == "autopilot":
         acc = plan.get("autopilot_accepted", "").strip().lower()
-        accepted = bool(re.match(r'^\d{4}-\d{2}-\d{2}[^"]*"i accept the autopilot risk"$', acc))
-        rules_ok = bool(re.fullmatch(r"\s*\d{5,}(\s*,\s*\d{5,})*\s*", plan.get("meta_rule_ids", "")))
+        accepted = bool(re.match(r'^\d{4}-\d{2}-\d{2},?\s*"i accept the autopilot risk"$', acc))
+        ids = re.findall(r"\d{12,}", plan.get("meta_rule_ids", ""))
+        rules_ok = bool(ids) and bool(re.fullmatch(r"\s*\d{12,}(\s*,\s*\d{12,})*\s*", plan.get("meta_rule_ids", "")))
+        live = today.get("meta_rules_live")
+        if rules_ok and isinstance(live, list) and not all(i in [str(x) for x in live] for i in ids):
+            rules_ok = False
+            out["notes"].append("a Meta safety rule named in meta_rule_ids is gone from the account")
         if accepted and rules_ok:
             out["mode"] = "autopilot"
         else:
             out["notes"].append("autopilot not active: " + ("autopilot_accepted must be the date and the quoted sentence, nothing else" if not accepted
-                                else "meta_rule_ids holds no Meta rule ids") + "; acting as approval mode")
+                                else "meta_rule_ids holds no live Meta rule ids") + "; acting as approval mode")
     raw_target = num(plan.get("target_cost_per_result"))
     target = raw_target if raw_target and raw_target > 0 else None
     if raw_target is not None and target is None:
@@ -130,12 +159,17 @@ def decide(plan, today, logc):
             out["notes"].append(f"ask_above_daily '{raw_ask}' is not a number; every raise asks first")
     total = num(plan.get("total_budget"))
     total = total if total and total > 0 else None
+    total_missing = policy == "fixed" and total is None
+    if total_missing:
+        out["notes"].append("fixed policy with no readable total_budget: no raises until it is set")
     limit = num(plan.get("autopilot_credit_limit_per_day")) or 0
     out["credit_limit"] = limit
     date = today["date"]
     budget = num(today.get("current_daily_budget"), 0) or 0
-    spent = num(today.get("spend_to_date"), 0) or 0
-    daily = [d for d in today.get("daily", []) if str(d.get("date", "")) < date]  # today is a partial day and never counts
+    spent = num(today.get("spend_to_date"))
+    spent_missing = spent is None
+    spent = spent or 0
+    daily = sorted([d for d in today.get("daily", []) if str(d.get("date", "")) < date], key=lambda d: str(d.get("date", "")))  # today is a partial day and never counts
     ads = [a for a in today.get("ads", []) if a.get("status", "ACTIVE") == "ACTIVE"]
     from datetime import date as D
     end = (plan.get("end_date") or "none").strip()
@@ -157,8 +191,11 @@ def decide(plan, today, logc):
     if policy == "fixed" and end_ok and date > end_ok:
         out["notes"].append("past end_date: report only, no changes")
         return finish()
-    if policy == "fixed" and total and spent >= total:
-        out["ask"].append(f"Total reached: {fmt(spent)} of {fmt(total)} spent. Pause the campaign? Reply 'pause the campaign'.")
+    if policy == "fixed" and total and spent_missing:
+        out["notes"].append("spend_to_date is missing from today.json; no budget change until the check-in reads it")
+    if policy == "fixed" and total and not spent_missing and spent >= total:
+        out["pause_campaign"] = True
+        out["ask"].append(f"Total reached: {fmt(spent)} of {fmt(total)} spent. The campaign is paused (autopilot) or should be: reply 'pause the campaign'.")
         out["notes"].append("total reached: no budget change")
         return finish()
 
@@ -171,10 +208,19 @@ def decide(plan, today, logc):
     share = budget / max(len(ads), 1)
     if target and ads and budget and budget * 7 / len(ads) < bleed:
         out["notes"].append(f"with {len(ads)} ads sharing {fmt(budget)} a day, no ad can reach the {fmt(bleed)} pause line in 7 days; lower pause_multiplier or run fewer ads")
+    week_spend = sum(num(d.get("spend"), 0) or 0 for d in daily)
+    tiny = False
+    if daily and week_spend and tot_spend > 2 * week_spend:
+        out["notes"].append(f"the ads' 7-day spend ({fmt(tot_spend)}) is more than twice the campaign's ({fmt(week_spend)}); a units mix-up, so no pauses this run")
+        ads = []
+    elif daily and budget and tot_res > 0 and 0 < tot_spend < 0.02 * budget * 7:
+        tiny = True
+        out["notes"].append(f"the ads' 7-day spend ({fmt(tot_spend)}) is under 2% of a week's budget while results exist; insights spend is already in whole units, so it looks divided by 100; no changes this run")
+        ads = []
     for a in ads:
         s, r = num(a.get("spend_7d"), 0) or 0, num(a.get("results_7d"), 0) or 0
         running = num(a.get("days_running"), 99)
-        if r == 0 and s > bleed and running >= 3 and s >= share:
+        if r == 0 and bleed > 0 and budget > 0 and s > bleed and running >= 3 and s >= share:
             out["pauses"].append({"id": a["id"], "name": a.get("name"), "why": f"{fmt(s)} spent, no results in 7 days"})
         elif r >= 10 and target and s / r > 2 * target:
             out["pauses"].append({"id": a["id"], "name": a.get("name"), "why": f"{fmt(s / r)} per result, over twice the {fmt(target)} target"})
@@ -189,20 +235,38 @@ def decide(plan, today, logc):
         s = sum(num(r.get("spend"), 0) or 0 for r in rows); n = sum(num(r.get("results"), 0) or 0 for r in rows)
         return s / n if n else (float("inf") if s > 0 else None)
     recent = daily[-after:]
-    recent_ok = bool(target) and len(recent) == after and all(
-        (num(r.get("spend"), 0) or 0) > 0 and (num(r.get("results"), 0) or 0) > 0
-        and (num(r.get("spend"), 0) or 0) / (num(r.get("results"), 0) or 1) < target for r in recent)
+    enough = len(daily) >= after
+    troas = num(plan.get("target_roas"))
+    use_roas = bool(troas and troas > 0 and daily and all("value" in r for r in daily))
+    if use_roas:
+        recent_ok = len(recent) == after and all(
+            (num(r.get("spend"), 0) or 0) > 0 and (num(r.get("value"), 0) or 0) / (num(r.get("spend"), 0) or 1) >= troas for r in recent)
+        wv, ws = sum(num(r.get("value"), 0) or 0 for r in daily), sum(num(r.get("spend"), 0) or 0 for r in daily)
+        week_roas = wv / ws if ws else None
+    else:
+        recent_ok = bool(target) and len(recent) == after and all(
+            (num(r.get("spend"), 0) or 0) > 0 and (num(r.get("results"), 0) or 0) > 0
+            and (num(r.get("spend"), 0) or 0) / (num(r.get("results"), 0) or 1) < target for r in recent)
+        week_roas = None
     week = cpr(daily) if daily else None
     plan_daily = num(plan.get("daily_budget"))
     units_ok = not (plan_daily and budget and not (0.5 * plan_daily <= budget <= 2 * plan_daily))
     new, why = None, None
     if not daily:
         out["notes"].append("no full days of numbers yet; no budget change")
+    elif policy == "fixed" and total and spent_missing:
+        pass
     elif not units_ok:
         out["notes"].append(f"the account's daily budget ({fmt(budget)}) is far from daily_budget in ads/CAMPAIGN.md ({fmt(plan_daily)}); a units mix-up? no budget change until that is fixed")
     elif logc["budget"] >= 1:
         out["notes"].append("budget already changed today")
-    elif target and week and week > 1.5 * target:
+    elif tiny:
+        pass
+    elif not enough:
+        out["notes"].append(f"only {len(daily)} full day(s) of numbers; cost-based changes wait for {after}")
+    elif use_roas and week_roas is not None and week_roas < troas / 1.5:
+        new, why = budget * (1 - step), f"7-day ROAS {week_roas:.2f} vs {troas:.2f} target"
+    elif not use_roas and target and week and week > 1.5 * target:
         if week == float("inf"):
             new, why = budget * (1 - step), "spend with no results in 7 days"
             out["ask"].append("No results in 7 days of spend. Pause the campaign? Reply 'pause the campaign'.")
@@ -210,8 +274,10 @@ def decide(plan, today, logc):
             new, why = budget * (1 - step), f"7-day cost per result {fmt(week)} vs {fmt(target)} target"
     elif recent_ok and policy == "scale" and not ceiling:
         out["ask"].append("Beating the target, but ads/CAMPAIGN.md has no daily_ceiling, so no raise. Reply 'set ceiling to <amount>'.")
+    elif recent_ok and total_missing:
+        out["ask"].append("Beating the target, but total_budget is missing or unreadable, so no raise. Reply 'raise total to <amount>' to set it.")
     elif recent_ok and policy in ("fixed", "scale"):
-        new, why = budget * (1 + step), f"last {after} days each under the {fmt(target)} target"
+        new, why = budget * (1 + step), (f"last {after} days each at or above {troas:.2f} ROAS" if use_roas else f"last {after} days each under the {fmt(target)} target")
     if policy == "fixed" and total and units_ok and daily:
         if end_ok:
             days_left = max(1, (D.fromisoformat(end_ok) - D.fromisoformat(date)).days + 1)
@@ -220,7 +286,7 @@ def decide(plan, today, logc):
                 new, why = cap, (why or "") + "; capped so the total lands on the end date"
                 if recent_ok:
                     out["ask"].append(f"Beating the target at the total. Raise the total above {fmt(total)}? Reply 'raise total to <amount>'.")
-            elif not new and budget > cap * 1.05:
+            elif not new and budget > cap * 1.05 and cap > 0:
                 new, why = cap, "lands the total on the end date"
         else:
             remaining = total - spent
@@ -314,18 +380,26 @@ def main():
     ap.add_argument("--plan", default=str(HERE / "CAMPAIGN.md"))
     ap.add_argument("--today", default=str(HERE / "today.json"))
     ap.add_argument("--log", default=str(HERE / "LOG.md"))
+    ap.add_argument("--actions", default=str(HERE / "actions.jsonl"))
     a = ap.parse_args()
     if a.takeover:
         print(json.dumps(takeover(json.loads((HERE / "takeover.json").read_text())), indent=2)); return
     pp = pathlib.Path(a.plan)
+    tp = pathlib.Path(a.today)
+    if not tp.exists():
+        import datetime
+        tp.write_text(json.dumps({"date": datetime.date.today().isoformat(), "daily": [], "ads": [], "note": "no numbers read yet"}))
     if not pp.exists():
         print(json.dumps({"error": f"{pp} is missing; build the campaign first (ads/BUILD.md)"})); sys.exit(2)
     ids = [l for l in pp.read_text().splitlines() if re.match(r"\s*campaign_id:\s*\S", l)]
     if len(ids) != 1:
         print(json.dumps({"error": f"ads/CAMPAIGN.md has {len(ids)} campaign_id lines; this folder runs exactly one campaign"})); sys.exit(2)
-    plan = read_plan(pp)
-    today = json.loads(pathlib.Path(a.today).read_text())
-    print(json.dumps(decide(plan, today, log_today(pathlib.Path(a.log), today["date"], HERE / "actions.jsonl")), indent=2))
+    try:
+        plan = read_plan(pp)
+        today = json.loads(pathlib.Path(a.today).read_text())
+        print(json.dumps(decide(plan, today, log_today(pathlib.Path(a.log), today["date"], pathlib.Path(a.actions))), indent=2))
+    except (ValueError, KeyError, OSError) as e:
+        print(json.dumps({"error": str(e)})); sys.exit(2)
 
 
 if __name__ == "__main__":

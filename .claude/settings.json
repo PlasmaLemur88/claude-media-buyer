@@ -72,8 +72,15 @@
       "mcp__pipeboard__update_facebook_page_post",
       "mcp__pipeboard__update_lead_gen_form_status",
       "mcp__pipeboard__update_value_rule_set",
-      "mcp__pipeboard__upload_conversion_events"
+      "mcp__pipeboard__upload_conversion_events",
+      "mcp__meta-ads"
+    ],
+    "ask": [
+      "mcp__pipeboard__create_campaign",
+      "mcp__pipeboard__create_adset",
+      "mcp__pipeboard__create_ad_rule",
+      "mcp__pipeboard__upload_ad_video"
     ]
   },
-  "_comment": "The deny list is the write guard for the ads part: an unattended run can never change targeting or an ad set, delete, duplicate, touch audiences, rules, catalogs, posts or account slots, even in Auto mode. It assumes the Pipeboard server is named 'pipeboard', as ads/SETUP.md adds it. The check-in needs only update_ad, update_campaign, create_ad_creative, create_existing_post_ad_creative, create_ad, create_video_upload_url, upload_ad_video_file and the read tools; the build adds create_campaign, create_adset and create_ad_rule."
+  "_comment": "The write guard for the ads part. deny: 60 Pipeboard tools an unattended run never needs (targeting and ad-set edits, deletes, duplicates, audiences, rules, catalogs, posts, account slots) plus Meta's own connector (mcp__meta-ads), which the prompts never use. ask: the build-time writes (new campaign, new ad set, new Meta rule, a video from a URL) stop for a human even in Auto mode, so they only happen while the operator watches. The check-in keeps update_ad, update_campaign, create_ad_creative, create_existing_post_ad_creative, create_ad, create_video_upload_url, upload_ad_video_file, upload_ad_image and the read tools. Keyed to a server named pipeboard, as ads/SETUP.md adds it; under another name the check-in reports and changes nothing."
 }

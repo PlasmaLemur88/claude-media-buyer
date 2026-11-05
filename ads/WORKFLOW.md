@@ -27,7 +27,8 @@ stage leaves behind is one campaign's state and is gitignored.
 Stage 1, Setup (`SETUP.md`)
 1. Connect Meta through Pipeboard.
 2. Brand guide and checklist (the brand interview, once per brand).
-3. Optional: a video provider, Slack, Google Drive. Each can be skipped; `status.py` says what you give up.
+3. Write guard: the folder's `.claude/settings.json` denies the connector tools the kit never needs; `status.py` checks it is in place and the server carries the name it is keyed to.
+4. Optional: a video provider, Slack, Google Drive. Each can be skipped; `status.py` says what you give up.
 
 Stage 2, Strategy (`STRATEGY.md`)
 1. Brief: what is promoted, the result that counts, who buys, the offer, the destination, the target cost. One round of questions.
@@ -65,4 +66,4 @@ Approval, the default: each stage stops where the steps above say "approved", ev
 
 Autopilot: chosen in the build interview (stage 4, step 3). It stays off until two lines exist in `CAMPAIGN.md`: the operator's typed acceptance from `BUILD.md` Step 4b ("I accept the autopilot risk") and the ids of the two Meta safety rules; `rules.py` checks both before it reports mode autopilot. Then, after "turn it on", the check-in and the weekly review run on their own inside the limits in `CHECKIN.md` STEP 7 and the autopilot exception at the end of `RULES.md`: pauses and the one budget change the rules return, one copy variant a day, the next queued brief built one a day within the credit limit, and new videos held for the operator's look unless they chose "launch". "Autopilot off" in any chat ends it.
 
-Rules that hold here as everywhere in the engine: Claude shows the script before it builds, asks before it spends credits, never activates an ad the operator did not name, and never sets a budget `rules.py` did not return.
+Rules that hold here as everywhere in the engine: Claude shows the script before it builds, asks before it spends credits, never activates an ad the operator did not name (in autopilot, that the accepted limits do not cover), and never sets a budget `rules.py` did not return.

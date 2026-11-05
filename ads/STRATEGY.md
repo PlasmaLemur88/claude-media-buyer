@@ -6,7 +6,7 @@ S1. The brief. Ask in ONE round, skipping anything `ads/BRIEF.md` or the brand g
 - Who buys, in one line (job, situation, what they are trying to do).
 - The offer in one line, as a customer would say it.
 - The target cost per result, or "unknown". If the operator thinks in ROAS, also the average order value: the target cost is the order value divided by the ROAS.
-- For a lead: is it captured on the page (the pixel's Lead event) or in a Meta instant form (its form id), and how many days until a lead is known to be real (lead_source and result_lag_days).
+- For a lead: is it captured on the page (the pixel's Lead event) or in a Meta instant form (its form id), how many days until a lead is known to be real, and what share of raw leads turn out real (lead_source, result_lag_days, qualified_share).
 - The URL tags (UTMs) every ad link carries, or "none", and the lowest creative number this campaign may use (number_floor, default 100), so brief numbers never collide with the team's.
 - Three to five competitors or accounts whose ads are worth reading, or "none".
 - Where the customer's own words live (reviews, comments, replies, support emails, a page), or "none".
@@ -29,7 +29,7 @@ S4. Test plan. Write `ads/TEST-PLAN.md`:
 - A round lasts 7 days. The next round's angles come from `ads/LEARNINGS.md`.
 Show the operator the angles and the plan together, in under 25 lines, and wait for "approved". Change only what they ask, then write `round 1 approved: yes` and the date at the end of round 1's section of `ads/TEST-PLAN.md`; a later round ends its own section with `round <N> approved: pending` until it is approved. `status.py` and the check-in read those lines.
 
-S5. Briefs. For each concept in the round, write `ads/briefs/<NNN>-<slug>.md` (NNN is the highest existing brief number plus one, never below `number_floor` from `ads/BRIEF.md`, which defaults to 100; the slug is the concept in CamelCase):
+S5. Briefs. For each concept in the round, write `ads/briefs/<NNN>-<slug>.md` (NNN is one more than the highest number anywhere: the briefs in `ads/briefs/`, the account's ad names with the brand prefix, the folders under output_root and the Built entries in `ads/LOG.md`; never below `number_floor` from `ads/BRIEF.md`, which defaults to 100; the slug is the concept in CamelCase):
 ```
 angle: A3
 round: 1
@@ -41,6 +41,6 @@ visual: <the look, in the brand's terms; the reference ad it is closest to. To p
 copy: primary text / headline / call to action
 destination: <url with the url_tags from ads/BRIEF.md>
 pass: <the two or three checklist lines that matter most for this concept>
-credits: <the engine's estimate for this format, or "none" for an existing ad, an existing post or a still>
+credits: <the engine's cost estimate for this format in dollars, or "none" for an existing ad, an existing post or a still>
 ```
 Then say: "Briefs are ready. Say 'make them' to start production, or 'build the campaign' to go to buying with the existing ads first."

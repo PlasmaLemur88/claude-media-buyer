@@ -8,7 +8,8 @@ and says what each missing piece costs you.
 ## 1. Meta, through Pipeboard
 
 1. Make an account at https://pipeboard.co, or accept the invite your team sent you.
-2. Connect your Meta login there and pick the ONE ad account Claude will use.
+2. Connect your Meta login there and pick the ad account Claude will use (one login can
+   hold several; each engine folder's campaign plan names the one it works on).
 3. Open this folder in Claude Code and say: "connect Pipeboard". Claude runs
    `claude mcp add --scope user --transport http pipeboard https://meta-ads.mcp.pipeboard.co/`
    and tells you to type `/mcp` and sign in. A browser window opens. Sign in with
@@ -19,11 +20,13 @@ and says what each missing piece costs you.
    permission. Choose "Always allow" every time, so the scheduled runs never stop
    to ask while you are away. If your Claude Code has the /permissions command,
    you can instead allow the whole server once with the rule `mcp__pipeboard`.
-6. The folder's `.claude/settings.json` denies every Pipeboard tool the ads part never
-   needs (anything that changes targeting or an ad set, deletes, duplicates, or touches
-   audiences, rules, catalogs, posts or account slots), so an unattended run cannot call
-   them even in Auto mode. It assumes the server is named pipeboard, as the command above
-   names it; keep that name.
+6. The folder's `.claude/settings.json` is the write guard: it denies the 60 Pipeboard
+   tools the ads part never needs (anything that changes targeting or an ad set, deletes,
+   duplicates, or touches audiences, rules, catalogs, posts or account slots) and Meta's
+   own connector, and it makes the build-time writes (a new campaign, a new ad set, a new
+   Meta rule) ask first, so they only happen while you watch. The guard is keyed to a server
+   named pipeboard, as the command above names it; under another name the check-in reports
+   and changes nothing.
 
 Meta's own free connector can do most of this job on your own Meta login; this
 engine's prompts are written for Pipeboard's tool names, so it is the supported route.
@@ -56,8 +59,8 @@ clients keeps five copies of the folder, each with its own scheduled tasks.
   team sees. Install Google Drive for desktop and sign in, then say "save the ads
   to Google Drive". Claude finds the Drive folder under
   `~/Library/CloudStorage/GoogleDrive-*`, asks which folder to use, creates
-  `<that folder>/Claude ads`, links it as `~/claude-ads` (no spaces, because spaces
-  break builds), sets the active brand's `brand.output_root` to it in
+  `<that folder>/Claude ads`, links it as `~/claude-ads-<brand slug>` (no spaces, because
+  spaces break builds; one link per brand, so two clients never share a folder), sets the active brand's `brand.output_root` to it in
   `brands/<slug>/brand.json`, re-runs `python3 scripts/brand.py use <slug>`, puts
   one small test file there and asks you to confirm it shows in Drive on the web.
 
