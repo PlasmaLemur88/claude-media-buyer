@@ -133,8 +133,8 @@ correction outlives the conversation.
 ## SPEND
 
 **Never spend a credit without asking.** One exception: in the `ads/` autopilot mode
-the operator set a daily credit limit in `ads/CAMPAIGN.md`, and that limit is the yes for one
-motion-graphics ad a day (see `ads/CHECKIN.md`, STEP 7). State the cost in credits or dollars and
+the operator set a daily credit limit in `ads/CAMPAIGN.md`, and that limit is the yes for the
+next queued brief, one a day (see `ads/CHECKIN.md`, STEP 7). State the cost in credits or dollars and
 get an explicit yes. Decide the stop-loss before the first paid call. Take one
 piece end to end (voice, picture, cut, the operator's ears and eyes) before
 generating a batch.
@@ -189,7 +189,7 @@ the correction to that brand's CHECKLIST.md in the same session and say you did.
 Every finished ad ships as the video (or still) in both ratios, 9:16 and 4:5, a
 copy sheet with the primary text, headline and call to action, and a thumbnail,
 all under one file stem. `docs/80-naming-and-delivery.md` has the naming
-convention. Anything uploaded to an ad account is created PAUSED, except in the `ads/` part when the operator types "turn it on" or "do it".
+convention. Anything uploaded to an ad account is created PAUSED, except in the `ads/` part when the operator types "turn it on" or "do it", or when an autopilot run acts inside the limits the operator accepted (a copy variant, a launch-mode video).
 
 ---
 
@@ -205,7 +205,8 @@ with existing ads skips production). Setup (Pipeboard, the brand, Slack, Google
 Drive) is `ads/SETUP.md`: do its steps yourself and hand the operator only the
 sign-ins. `ads/LOG.md` is the memory every run appends to.
 
-- **"Set up the team"** (after "turn it on"): create the scheduled tasks, from a chat
+- **"Set up the team"** (after "turn it on"): first delete any check-in, alert, weekly or
+  report task this folder already has, so a second run never doubles them; then create the scheduled tasks, from a chat
   opened in this folder so each task's working folder is this folder and the Pipeboard
   tools and this file load. First ask the operator to switch this chat's permission
   mode to Auto, so the tasks are saved in a mode that will not stop on a permission
@@ -224,9 +225,9 @@ sign-ins. `ads/LOG.md` is the memory every run appends to.
   total to <X>", "raise ceiling to <X>", "set ceiling to <X>" and "the cut is good" all
   go through `ads/CHECKIN.md` STEP 6, which reads the newest Check-in entry in
   `ads/LOG.md` first.
-- **"Launch it"** typed in any chat: find the newest "Built video ... waiting for your
-  look" entry in `ads/LOG.md`, upload those files and switch the ads on by
-  `ads/CHECKIN.md` STEP 6, and log a Changed status entry.
+- **"Launch it"** typed in any chat: find every "Built video ... waiting for your
+  look" entry in `ads/LOG.md` whose files are not yet ads in the campaign, upload them all
+  and switch the ads on by `ads/CHECKIN.md` STEP 6, and log a Changed status entry.
 - **"Approved"** typed in any chat after a weekly review: change the newest
   `round <N> approved: pending` line in `ads/TEST-PLAN.md` to yes, set `round: <N>` and
   `round_started: <today>` in `ads/CAMPAIGN.md`, log it, and say "make them" starts
@@ -236,7 +237,8 @@ sign-ins. `ads/LOG.md` is the memory every run appends to.
 - **"Stand down the team"**: delete this folder's check-in, spend alert, weekly review
   and report scheduled tasks, log a Changed status entry, confirm in one line. The final
   report of a fixed campaign does this itself.
-- **"New campaign"**: move everything in `ads/` that one campaign leaves behind (the plan,
+- **"New campaign"**: only after "stand down the team" and with the old CLAUDE | campaign
+  paused or ended; move everything in `ads/` that one campaign leaves behind (the plan,
   the log, the brief, research, angles, test plan, briefs, checks, DELIVERED.md,
   today.json, takeover.json, actions.jsonl, the reports) into `ads/archive/<campaign
   name>/`, keep `ads/LEARNINGS.md` where it is, then start at `ads/STRATEGY.md` S1, which

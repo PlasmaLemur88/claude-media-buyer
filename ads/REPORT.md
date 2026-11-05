@@ -26,4 +26,4 @@ Never invent a number. Anything you could not read, say so on its line.
 
 STEP 5. Deliver it.
 Append a "Report" entry to `ads/LOG.md`. If the brand's output_root is a Drive-synced folder, copy the report, `ads/LOG.md` and `ads/CAMPAIGN.md` into `<output_root>/_campaign/`. If `ads/SLACK-CHANNEL.txt` names a channel and Slack is connected, post paragraph 1 and the top three ads there with the line "Full report saved to <path>."
-If budget_policy is fixed, the campaign is over: delete this folder's check-in, spend alert and weekly review scheduled tasks (the scheduled-tasks tool; this report's own one-time task disables itself), log a "Changed status" entry saying the tasks were removed, and tell the operator that "new campaign" starts the next one (CLAUDE.md says what it archives).
+If budget_policy is fixed and today is after end_date, the campaign is over: delete this folder's check-in, spend alert and weekly review scheduled tasks (the scheduled-tasks tool; this report's own one-time task disables itself), log a "Changed status" entry saying the tasks were removed, and tell the operator that "new campaign" starts the next one (CLAUDE.md says what it archives).

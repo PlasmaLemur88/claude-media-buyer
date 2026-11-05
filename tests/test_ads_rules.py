@@ -123,7 +123,7 @@ check("a shared saved audience warns", len(o["warnings"]) == 1 and "same saved a
 
 # --- what the safety review broke, now held
 ps = {"budget_policy": "scale", "target_cost_per_result": "1.50", "daily_ceiling": "none", "ask_above_daily": "never"}
-o = R.decide(ps, dict(base, current_daily_budget=50000, daily=days(50000, 40000), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+o = R.decide(ps, dict(base, current_daily_budget=50000, daily=days(50000, 40000), ads=ads((200000, 150000), (150000, 120000))), NOLOG)
 check("scale with no ceiling never raises, asks for one", o["budget"] is None and any("ceiling" in q for q in o["ask"]))
 o = R.decide(dict(ps, daily_ceiling="3000", ask_above_daily="1100 a day"), dict(base, daily=days(1000, 800), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
 check("an unreadable ask-first line means every raise asks", o["budget"] and o["budget"]["needs_approval"])
@@ -161,7 +161,7 @@ o = R.decide({"budget_policy": "fixed", "target_cost_per_result": "1.50", "total
 check("a bad end date is named, not crashed on", any("end_date" in n for n in o["notes"]))
 import tempfile, pathlib as PL
 with tempfile.TemporaryDirectory() as d:
-    lg = PL.Path(d) / "LOG.md"; lg.write_text("# Campaign log\n## 2026-11-12 09:30 Approved\nbudget 1000 -> 1200\n")
+    lg = PL.Path(d) / "LOG.md"; lg.write_text("# Campaign log\n## 2026-11-12 09:30 Approved\ndaily budget 1000 -> 1200\n")
     check("an Approved entry about the budget counts as today's change", R.log_today(lg, "2026-11-12")["budget"] == 1)
     ac = PL.Path(d) / "actions.jsonl"; ac.write_text('{"date": "2026-11-12", "kind": "copy", "id": "9"}\n')
     check("an attempted write in actions.jsonl counts", R.log_today(PL.Path(d) / "none.md", "2026-11-12", ac)["copy"] == 1)
@@ -169,6 +169,70 @@ o = R.takeover(dict(T0, campaigns=[camp(id="c1", budget_level="adset", n_adsets=
 check("several restructure campaigns are all listed", o["account"]["call"] == "restructure" and o["account"]["campaign_ids"] == ["c1", "c2"])
 o = R.takeover(dict(T0, wanted_event="", campaigns=[camp(event="PURCHASE")]))
 check("take stock without a goal warns", any("wanted_event" in w for w in o["warnings"]))
+
+# --- the second hostile review
+o = R.decide(dict(pa, autopilot_accepted='2026-11-05, operator has not yet typed "I accept the autopilot risk"', meta_rule_ids="120255000000001"), dict(base, daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("words between the date and the sentence do not accept the risk", o["mode"] == "approval")
+o = R.decide(dict(pa, autopilot_accepted='2026-11-05, "I accept the autopilot risk"', meta_rule_ids="12345"), dict(base, daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("five digits are not a Meta rule id", o["mode"] == "approval")
+o = R.decide(dict(pa, autopilot_accepted='2026-11-05, "I accept the autopilot risk"', meta_rule_ids="120255000000001, 120255000000002"),
+             dict(base, meta_rules_live=["120255000000001"], daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("a Meta rule gone from the account turns autopilot off", o["mode"] == "approval" and any("gone" in n for n in o["notes"]))
+o = R.decide({"budget_policy": "fixed", "target_cost_per_result": "1.50", "total_budget": "10k", "end_date": "2026-11-20"}, dict(base, daily=days(1000, 800), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("an unreadable total under fixed blocks the raise and says so", o["budget"] is None and any("total_budget" in n for n in o["notes"]))
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "$1.50 per signup"}, dict(base, daily=days(1000, 100), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("an unreadable target is named", any("target_cost_per_result" in n for n in o["notes"]))
+o = R.decide({"budget_policy": "Fixed", "target_cost_per_result": "1.50", "total_budget": "10000", "end_date": "2026-11-01"}, dict(base, spend_to_date=10500, daily=days(1000, 0), ads=ads((2333, 0), (2333, 0), (2333, 0))), NOLOG)
+check("a capitalised policy still reads as fixed and past end date", o["pauses"] == [] and o["budget"] is None)
+t = dict(base, daily=days(1000, 800), ads=ads((3000, 2000), (2000, 1500))); del t["spend_to_date"]
+o = R.decide({"budget_policy": "fixed", "target_cost_per_result": "1.50", "total_budget": "10000", "end_date": "2026-11-14"}, t, NOLOG)
+check("a missing spend_to_date under fixed blocks the budget change", o["budget"] is None and any("spend_to_date" in n for n in o["notes"]))
+o = R.decide({"budget_policy": "fixed", "target_cost_per_result": "1.50", "total_budget": "10000", "end_date": "2026-11-20"}, dict(base, spend_to_date=10500, daily=days(1000, 800), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("the total reached sets pause_campaign for autopilot", o["pause_campaign"] is True)
+good = [{"date": f"2026-11-{5+i:02d}", "spend": 1000, "results": 800} for i in range(4)]
+bad = [{"date": f"2026-11-{9+i:02d}", "spend": 1000, "results": 60} for i in range(3)]
+o = R.decide(p, dict(base, daily=list(reversed(good + bad)), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("daily rows are sorted before the last-days test", o["budget"] is None or o["budget"]["to"] < 1000)
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "1.50"}, dict(base, daily=days(1000, 700), ads=ads((300000, 2000), (200000, 1500), (50000, 400), (40000, 300), (30000, 200))), NOLOG)
+check("ad spend in cents against a budget in dollars pauses nothing", o["pauses"] == [] and any("units" in n for n in o["notes"]))
+o = R.decide({"budget_policy": "steady"}, dict(base, current_daily_budget="", daily=days(1000, 700), ads=ads((20, 0), (25, 0), (18, 0), (3000, 2000), (2000, 1500))), NOLOG)
+check("no target and a blank budget pauses nothing", o["pauses"] == [])
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "inf"}, dict(base, daily=days(1000, 1), ads=ads((3000, 2), (2000, 1))), NOLOG)
+check("an infinite target is none", o["budget"] is None and o["pauses"] == [])
+with tempfile.TemporaryDirectory() as d:
+    ac = PL.Path(d) / "actions.jsonl"; ac.write_text('null\n{"date": "2026-11-12T09:30", "kind": "budget"}\n')
+    check("a null line is skipped and a dated time still counts", R.log_today(PL.Path(d) / "none.md", "2026-11-12", ac)["budget"] == 1)
+    pl = PL.Path(d) / "CAMPAIGN.md"; pl.write_text("campaign_id: 1\nmode: approval\nmode: autopilot\n")
+    try:
+        R.read_plan(pl); check("a repeated key is refused", False)
+    except ValueError as e:
+        check("a repeated key is refused", "repeats mode" in str(e))
+    pl.write_text("campaign_id: 1\nbudget_policy: Fixed\n")
+    check("enumerated values are lower-cased", R.read_plan(pl)["budget_policy"] == "fixed")
+try:
+    R.decide({"budget_policy": "steady"}, dict(base, date="11/20/2026", daily=days(1000, 700), ads=ads((3000, 2000),)), NOLOG); check("a malformed today date is refused", False)
+except ValueError:
+    check("a malformed today date is refused", True)
+
+# --- the second walkthrough
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "1.50"}, dict(base, daily=days(1000, 700), ads=ads((30, 20), (20, 15), (5, 0))), NOLOG)
+check("ad spend that looks divided by 100 blocks changes", o["pauses"] == [] and o["budget"] is None and any("divided by 100" in n for n in o["notes"]))
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "1.50"}, dict(base, daily=[{"date": "2026-11-11", "spend": 150, "results": 0}], ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("one partial launch day does not cut the budget", o["budget"] is None and any("full day" in n for n in o["notes"]))
+pr = {"budget_policy": "scale", "target_cost_per_result": "30", "target_roas": "3", "daily_ceiling": "3000", "currency": "EUR"}
+good_roas = [{"date": f"2026-11-{5+i:02d}", "spend": 1000, "results": 40, "value": 3300} for i in range(7)]
+o = R.decide(pr, dict(base, daily=good_roas, ads=ads((3000, 100), (2000, 80))), NOLOG)
+check("a ROAS target raises on value, not count", o["budget"] and o["budget"]["to"] == 1200 and "ROAS" in o["budget"]["why"])
+bad_roas = [{"date": f"2026-11-{5+i:02d}", "spend": 1000, "results": 40, "value": 1500} for i in range(7)]
+o = R.decide(pr, dict(base, daily=bad_roas, ads=ads((3000, 100), (2000, 80))), NOLOG)
+check("many cheap orders with a low ROAS still cut", o["budget"] and o["budget"]["to"] == 800)
+with tempfile.TemporaryDirectory() as d:
+    lg = PL.Path(d) / "LOG.md"; lg.write_text("# Campaign log\n## 2026-11-12 09:30 Changed total\ntotal_budget 10000 -> 12000\n")
+    check("raising the total is not the day's budget change", R.log_today(lg, "2026-11-12")["budget"] == 0)
+    import subprocess
+    pl = PL.Path(d) / "CAMPAIGN.md"; pl.write_text("campaign_id: 1\nbudget_policy: fixed\ntarget_cost_per_result: 1.5\ntotal_budget: 10000\nend_date: 2099-01-01\n")
+    r = subprocess.run([sys.executable, str(ROOT / "ads" / "rules.py"), "--plan", str(pl), "--today", str(PL.Path(d) / "today.json"), "--log", str(lg), "--actions", str(PL.Path(d) / "a.jsonl")], capture_output=True, text=True)
+    check("a first run with no today.json still answers", r.returncode == 0 and '"mode"' in r.stdout)
 
 print(f"\n  {run - fails} passed, {fails} failed")
 sys.exit(1 if fails else 0)

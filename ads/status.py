@@ -28,6 +28,19 @@ def plan(ads):
     return out
 
 
+def guard_ok(root, cfg_text):
+    """The deny list is in place and the Pipeboard server carries the name it is keyed to."""
+    try:
+        deny = json.loads(read(root / ".claude" / "settings.json") or "{}").get("permissions", {}).get("deny", [])
+    except json.JSONDecodeError:
+        return False
+    try:
+        servers = json.loads(cfg_text or "{}").get("mcpServers", {})
+    except json.JSONDecodeError:
+        servers = {}
+    return "mcp__pipeboard__update_adset" in deny and "mcp__pipeboard__create_adset" not in [d for d in deny if False] and "pipeboard" in servers
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--short", action="store_true")
@@ -38,7 +51,7 @@ def main():
     a = ap.parse_args()
     root = pathlib.Path(a.root); ads = root / "ads"
     p = plan(ads)
-    cfg = read(pathlib.Path(a.cfg)).lower()
+    cfg = read(pathlib.Path(a.cfg))
     env = read(root / ".env")
     has = lambda k: re.search(rf"(?m)^{k}=\S", env) is not None
     cur = read(root / ".current_brand").strip()
@@ -59,15 +72,15 @@ def main():
 
     briefs = list((ads / "briefs").glob("*.md")) if (ads / "briefs").exists() else []
     delivered = [l for l in read(ads / "DELIVERED.md").splitlines() if l.strip() and not l.startswith("#")]
-    fixed = p.get("budget_policy", "fixed") == "fixed"
-    auto = p.get("mode") == "autopilot"
-    always_on = p.get("budget_policy") in ("scale", "steady")
+    fixed = p.get("budget_policy", "fixed").lower() == "fixed"
+    auto = p.get("mode", "").lower() == "autopilot"
+    always_on = p.get("budget_policy", "").lower() in ("scale", "steady")
 
     stages = [
         ("Setup", [
-            ("Meta connected (Pipeboard)", "pipeboard" in cfg or bool(p) or passed("checks/tracking.md")),
+            ("Meta connected (Pipeboard)", "pipeboard" in cfg.lower() or bool(p) or passed("checks/tracking.md")),
             ("Brand guide and checklist", bool(cur) and (root / "brands" / cur / "CHECKLIST.md").exists()),
-            ("Write guard (the Pipeboard deny list in .claude/settings.json)", "mcp__pipeboard__update_adset" in read(root / ".claude" / "settings.json")),
+            ("Write guard (the Pipeboard deny list in .claude/settings.json, server named pipeboard)", guard_ok(root, read(pathlib.Path(a.cfg)))),
         ]),
         ("Strategy", [
             ("Brief", (ads / "BRIEF.md").exists()),
@@ -91,7 +104,7 @@ def main():
         ] + ([("Final report scheduled", task("REPORT.md"))] if fixed else [])),
     ]
     extras = [
-        ("Video provider (fal, Replicate or Higgsfield)", has("FAL_KEY") or has("REPLICATE_API_TOKEN") or "higgsfield" in cfg,
+        ("Video provider (fal, Replicate or Higgsfield)", has("FAL_KEY") or has("REPLICATE_API_TOKEN") or "higgsfield" in cfg.lower(),
          "Claude can brief new ads but not make them"),
         ("Slack updates", bool(read(ads / "SLACK-CHANNEL.txt").strip()), "reports only show up inside Claude Code"),
         ("Files saved to Google Drive", bool(bj.get("brand", {}).get("output_root")), "finished ads stay on this Mac only"),
@@ -107,7 +120,7 @@ def main():
     today = a.today or datetime.date.today().isoformat()
     end = p.get("end_date", "none")
     reports = sorted(ads.glob("REPORT-*.md"))
-    ended = fixed and bool(p.get("campaign_id")) and ((re.match(r"\d{4}-\d{2}-\d{2}$", end) and today > end) or bool(reports))
+    ended = fixed and bool(p.get("campaign_id")) and bool(re.match(r"\d{4}-\d{2}-\d{2}$", end)) and today > end
     if ended:
         line = f"Campaign ended ({end}); report {'written' if reports else 'due'}. Say 'new campaign' to start another."
         if a.short:
