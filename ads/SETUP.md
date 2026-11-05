@@ -1,4 +1,4 @@
-# Stage 0: Setup
+# Stage 1: Setup
 
 Do these once per Mac. Claude does the parts it can; you do the sign-ins. Then say
 "run my ads" and Claude starts stage 2 (`WORKFLOW.md` has the whole path). Say
@@ -19,6 +19,11 @@ and says what each missing piece costs you.
    permission. Choose "Always allow" every time, so the scheduled runs never stop
    to ask while you are away. If your Claude Code has the /permissions command,
    you can instead allow the whole server once with the rule `mcp__pipeboard`.
+6. The folder's `.claude/settings.json` denies every Pipeboard tool the ads part never
+   needs (anything that changes targeting or an ad set, deletes, duplicates, or touches
+   audiences, rules, catalogs, posts or account slots), so an unattended run cannot call
+   them even in Auto mode. It assumes the server is named pipeboard, as the command above
+   names it; keep that name.
 
 Meta's own free connector can do most of this job on your own Meta login; this
 engine's prompts are written for Pipeboard's tool names, so it is the supported route.
@@ -30,7 +35,9 @@ banned words and a file prefix, and writes the checklist every video is reviewed
 against. Once per brand; you can have many. Claude picks the brand itself when
 exactly one exists besides `example` and `_template` (`python3 scripts/brand.py
 use <slug>`), and a brand with no `CHECKLIST.md` gets one from
-`brands/_template/CHECKLIST.md` before production.
+`brands/_template/CHECKLIST.md` before production. One engine folder runs one brand
+and one campaign at a time, and the campaign plan names its brand; someone with five
+clients keeps five copies of the folder, each with its own scheduled tasks.
 
 ## 3. Optional, skip any of them
 

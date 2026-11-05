@@ -11,7 +11,7 @@ You are the media buyer. You set up a new end-to-end Meta Ads campaign in the op
 
 ## Step 0: The brand and the handoff
 Run `python3 scripts/brand.py show`. If no brand is active, or the only brands are `example` and `_template`, run the `brand-guide` skill with the operator first (a short interview that saves the brand's name, look, voice and a file_prefix such as ACME), then continue. Every new ad written later follows that brand guide.
-Read `ads/BRIEF.md` and `ads/DELIVERED.md` if they exist: the strategist stage already settled the goal, the event, who buys, the offer, the destination and the target cost, and production already delivered the ads (or named the existing ads to reuse). Do not ask any of that again; say in one line what you took from them. If neither exists, say that the strategy stage was skipped and ask the questions below in full.
+Read `ads/BRIEF.md` and `ads/DELIVERED.md` if they exist: the strategist stage already settled the goal, the event, who buys, the offer, the destination and the target cost, and production already delivered the ads (or named the existing ads to reuse). Do not ask any of that again; say in one line what you took from them. If neither exists, say that the strategy stage was skipped, ask the first three questions of Step 2 now (what is promoted and its URL, the objective and its event, the target), because take stock in Step 1a needs the wanted event and the target to judge the live campaigns, and ask the rest of Step 2 after Step 1b.
 
 ## Step 1: Review the account before asking anything
 1. Confirm you are connected to the operator's ad account. Show the account name and ID, and stop if it is wrong.
@@ -20,22 +20,23 @@ Read `ads/BRIEF.md` and `ads/DELIVERED.md` if they exist: the strategist stage a
 4. Keep this summary short. Use it to make the questions below specific (for example, "your last 3 campaigns optimized for Purchase, same here?") rather than generic.
 
 ## Step 1a: Take stock of what is already running
-If the account has ACTIVE campaigns, decide what to do with them before anything else is built; a buyer taking over an account never adds a campaign on top of ones they have not read. For each ACTIVE campaign read: its objective and the event its ad sets optimize for (get_adset_details), whether the budget sits on the campaign or on the ad sets, how many ad sets, lifetime or daily budget, the last 7 days and the 7 before (spend, results, frequency, ctr) from get_insights, and its learning stage. For every pair that optimizes for the event the operator wants, call get_campaign_audience_overlap. Write it all to `ads/takeover.json` in the shape the top of `ads/rules.py` shows, run `python3 ads/rules.py --takeover`, and show one line per campaign with its outcome and reason, then the account-level call:
+If the account has campaigns whose effective_status is ACTIVE (get_campaigns with status_filter ACTIVE; an ad set switched on inside a paused campaign does not count), decide what to do with them before anything else is built; a buyer taking over an account never adds a campaign on top of ones they have not read. For each ACTIVE campaign read: the event its ad sets optimize for (get_adset_details: promoted_object.custom_event_type, for example PURCHASE or COMPLETE_REGISTRATION; with no promoted_object, the optimization_goal itself, for example LINK_CLICKS or LEAD_GENERATION), whether the budget sits on the campaign (get_campaign_details shows daily_budget or lifetime_budget) or on the ad sets, how many ad sets, lifetime or daily budget, the last 7 full days and the 7 before (spend, results, frequency, ctr) from get_insights with explicit since and until dates in the account's time zone, and its learning stage (learning_stage_info.status: LEARNING, SUCCESS, or FAIL, which means learning limited; absent means not reported). Read results the way `ads/CHECKIN.md` STEP 2 says: one action_type per event, never a sum of Meta's duplicate names. Overlap: call get_campaign_audience_overlap on each campaign (it names ad sets inside one campaign that share a saved audience), and for every pair of campaigns that optimize for the event the operator wants, compare the custom_audiences in their ad sets' targeting; a shared audience goes into `overlaps` as `{"a", "b", "shared": [names]}`. Write it all to `ads/takeover.json` in the shape the top of `ads/rules.py` shows, run `python3 ads/rules.py --takeover`, and show one line per campaign with its outcome and reason, then the account-level call:
 - adopt: keep it and manage it as it is (rebuilding resets what Meta learned);
 - refresh: keep it, put new creative into its existing ad set first;
 - restructure: one new campaign with its winning ads, then pause it;
 - leave: it does a different job; leave it alone and build new alongside.
-Plus any overlap warning. The operator picks: "adopt <id>", "refresh <id>", "restructure <id>" or "new". Write the choice to `ads/checks/takeover.md` (first line the choice, then the table) and carry it into `ads/CAMPAIGN.md` as `takeover:` and `source_campaign_id:`. If nothing is running, write "new: nothing running" and move on.
+Plus any overlap warning. The operator picks: "adopt <id>", "refresh <id>", "restructure" or "new". If they type adopt for a campaign the rules marked restructure because its budgets sit on the ad sets, say that the check-in can only move a campaign-level budget and ask again. Restructure takes every campaign the rules gave that call (`account.campaign_ids`): the one new campaign gets the winning ads of all of them, and `source_campaign_ids` lists each one so the check-in watches them until they are paused. Write the choice to `ads/checks/takeover.md` (first line the choice, then the table) and carry it into `ads/CAMPAIGN.md` as `takeover:` and `source_campaign_ids:`. If nothing is running, write "new: nothing running" and move on.
 
 ## Step 1b: Tracking check (before any money moves)
-Call get_pixels: the pixel's last_fired_time must be within the last 24 hours. Call get_insights at the account level for the last 7 days and read the count of the event the campaign will optimize for. Fetch the destination URL from the shell (`curl -sIL <url>`) and confirm it answers 200. Write `ads/checks/tracking.md` with the three numbers and `PASS` or `FAIL` on the first line. If the pixel is silent for over a day, the event count is 0, or the page does not answer, stop here and tell the operator what to fix; a campaign optimized for an event that never fires buys nothing.
+Call get_pixels: the pixel's last_fired_time must be within the last 24 hours. Then the event. When the pixel (or a dataset) records it, call get_insights at the account level for the last 7 days and read its count under the one action_type `ads/CHECKIN.md` STEP 2 maps it to, and write that name into `ads/CAMPAIGN.md` as `result_action_type`, so no later run guesses it. A count of 0 with a pixel that fired in the last 24 hours is a new account, not a broken one: ask the operator to trigger the event once on the destination (a test signup or order), re-read, and PASS with the note "no history" when the pixel fires. When the lead is a Meta instant form (`lead_source: form <id>` in `ads/BRIEF.md`), skip the pixel event and the URL: call get_lead_gen_forms and PASS when the form exists and is live; results then read as `lead`. When the objective is traffic or engagement, there is no event to count; PASS on the destination alone. Fetch the destination URL from the shell (`curl -sIL <url>`) and confirm the chain ends in 200. Write `ads/checks/tracking.md` with the numbers and `PASS` or `FAIL` on the first line. Stop only for a pixel silent for over a day, a form that does not exist, or a page that does not answer; a campaign optimized for an event that never fires buys nothing.
 
 ## Step 2: Ask the operator questions in short rounds (3-5 questions at a time, not one long list)
 
 **Goal and offer**
 - What is being promoted, and what is the landing page URL?
 - What is the objective (sales, leads, traffic, awareness, app installs), and which conversion event should the campaign optimize for?
-- Is there a target CPA or ROAS?
+- Is there a target cost per result? When the operator thinks in ROAS, ask the average order value in the same breath and compute the target cost as the order value divided by the ROAS; save `target_roas` and `aov` too, and the report shows ROAS beside cost.
+- For a lead: is it captured on the operator's page (the pixel's Lead event) or in a Meta instant form (its form id)? How many days until a lead is known to be real? (Saved as lead_source and result_lag_days; the weekly review judges cohorts older than the lag.)
 
 **Budget, scale and limits** (nothing here is preset; every number is the operator's)
 - Which budget policy?
@@ -46,19 +47,21 @@ Call get_pixels: the pixel's last_fired_time must be within the last 24 hours. C
 - Fixed: the total and the end date (the total also becomes a spend cap on the campaign in Meta). Scale: the daily ceiling. Steady: nothing more.
 - How fast to scale: the most the budget may move in one change (default 20%), and how many days in a row must beat the target first (default 3).
 - When must Claude ask first? A daily budget above which every raise waits for the operator's yes, even in autopilot (or "never ask").
-- Start date and time. (Read the account's time zone with get_account_info and use it for every date and every "today".)
+- How much may one ad spend with no result before the check-in pauses it? Default 3 times the target cost (saved as pause_multiplier). With a high target and many ads, 3 times can be more than any one ad spends in a week; say so when the numbers work out that way, and offer a lower multiplier or fewer ads.
+- Start date and time. (Read the account's time zone and currency with get_account_info, and the minor-unit offset from the currency_units note Pipeboard returns with any campaign read; save them as account_timezone, currency and currency_offset, and use them for every date, every amount and every "today". Every amount in the plan is in whole currency units.)
 
 **Targeting**
 - Which countries to target? If US, all states or specific states? Any cities, regions or zip codes to include or exclude?
 - Age range and gender? (Default: 18-65+, all genders.)
 - Should the campaign exclude anyone, such as existing customers, recent purchasers, current leads, website visitors, or audiences from other campaigns? List the custom audiences available for this.
 - Any language targeting?
+- Which placements: all of them (Advantage+ placements, the default) or a list, for example Instagram only? Saved as `placements`; the weekly audit then marks a placement finding as the operator's choice.
 
 **Creative**
 - Where are the creatives coming from: `ads/DELIVERED.md` when production delivered them (do not ask), else existing ads in the account, existing FB/IG posts, a Google Drive or Dropbox folder, or files the operator will upload?
 - Primary text, headline, description and CTA button for each ad, or should you draft options for the operator to approve?
 - Which Facebook Page and Instagram account should the ads run from?
-- Any UTM parameters or URL tags to add?
+- URL tags (UTMs): take them from `ads/BRIEF.md` when the strategist recorded them; otherwise ask.
 
 **Naming**
 - The campaign name must start with "CLAUDE | ". For the ad set and ads, is there a naming convention to follow? If not, propose one based on the existing campaigns in the account.
@@ -68,19 +71,20 @@ Call get_pixels: the pixel's last_fired_time must be within the last 24 hours. C
 - Autopilot: Claude acts on its own inside limits. If the operator asks for it, ask for the daily credit limit for new videos and whether new videos wait for their look ("hold", the default) or go live unseen ("launch"), then do Step 4b before writing `mode: autopilot`. Autopilot is never switched on by a default or a shrug.
 
 **Creative numbers**
-- New creatives get a three-digit number in the file and ad name. Is there a lowest number this campaign should use, so it never collides with numbers the operator's team uses elsewhere? (Save it as number_floor; if they have none, use 100.)
+- New creatives get a three-digit number in the file and ad name. Take number_floor from `ads/BRIEF.md` when the strategist recorded it; otherwise ask for the lowest number this campaign should use, so it never collides with numbers the operator's team uses elsewhere, and save it as number_floor (100 if they have none).
 
 ## Step 3: Check similar past campaigns
 If any existing campaign looks similar to this one (same product, offer, objective or audience), tell the operator which one(s) and how they performed, then ask:
 - Do they want to reuse any of its targeting (locations, age, exclusions, custom audiences)?
 - Do they want to duplicate any of its top-performing creatives into the new ad set? Show the top ads ranked by the metric that matches this campaign's goal, with spend, results, cost per result and CTR, and let them choose which ones to bring over.
-Only duplicate the creatives the operator approves.
+Only duplicate the creatives the operator approves. When the creatives come from existing ads (this step, or `ads/DELIVERED.md` naming them), append one line per ad to `ads/DELIVERED.md` in its format (`existing ad <id>`), so the tracker and the check-in's queue see them.
 
 ## Step 4: Confirm the plan before building
 Show one summary with:
 - Campaign: name (starting "CLAUDE | "), objective, budget type and amount, total budget, schedule with end date, bid strategy, target cost per result
 - Ad set: name, locations, age and gender, exclusions, placements, optimization event, pixel
 - Ads: name, creative source, copy, CTA, URL plus UTMs, Page and IG identity. Duplicated ads keep their original ad name, so their history stays readable.
+- The pause line: pause_multiplier times the target cost, and whether any ad can reach it in a week (daily budget times 7, divided by the number of ads); if none can, say the pause rule would never fire and propose a lower multiplier or fewer ads
 - Anything you assumed or defaulted that the operator did not explicitly confirm
 
 Wait for the operator's explicit "approved" before creating anything.
@@ -95,14 +99,15 @@ Before `mode: autopilot` is written anywhere, show this, in plain words, with th
 Then ask the operator to type exactly: I accept the autopilot risk. If they type anything else, keep mode: approval and say so. If they type it, write `autopilot_accepted: <date>, "I accept the autopilot risk"` into `ads/CAMPAIGN.md`. The check-in treats autopilot as approval mode until that line and the Meta safety rule ids are both there.
 
 ## Step 5: Build and verify
+First: if `ads/CAMPAIGN.md` already exists with a different campaign_id, stop; this folder runs one campaign at a time. Write a new plan only if the operator types "replace campaign <old id>" and that campaign reads PAUSED in the account; otherwise "new campaign" (CLAUDE.md) archives the old state first.
 If the operator chose adopt or refresh: do not build. Point the plan at the live campaign (campaign_id, campaign_name and ad_set_id from the account; list every ad set id if there are several), keep its budget as the starting daily budget unless they changed it, and apply the budget policy, limits and safety rules from Steps 2 and 4b to it. Then skip to writing `ads/CAMPAIGN.md` and Step 7; the launch check writes `PASS: adopted live campaign` to `ads/checks/launch.md` since it is already live, and "Turned on" is logged as "Turned on (adopted)". For refresh, the strategist's round 1 briefs are the first job after that, and the check-in uploads them into ad_set_id.
 If they chose restructure or new:
-- Create the campaign, then the ad set, then the creatives and ads, all PAUSED. For restructure, the old campaign's top ads (Step 3) are the first ads in it.
-- If the policy is fixed, set the campaign's spend_cap to the total budget with update_campaign (minor units: 100 = 1.00 in the account currency), read it back, and show the number. Meta then stops delivery when the campaign has spent the total.
+- Create the campaign PAUSED, then the ad set ACTIVE inside it (it stays dark under the paused campaign, and "turn it on" then never has to edit an ad set), then the creatives and the ads, every ad PAUSED. For restructure, the top ads of every campaign in source_campaign_ids (Step 3) are the first ads in it.
+- If the policy is fixed, set the campaign's spend_cap to the total budget with update_campaign (the whole-unit total times currency_offset), read it back, and show the number. Meta then stops delivery when the campaign has spent the total.
 - Safety rules inside Meta (they run every 30 minutes on Meta's side, even when the operator's Mac is off). If they chose autopilot or an always-on policy, create these with create_ad_rule, read them back, and list their ids:
-  1. "CLAUDE | pause dead ads": entity_type AD in this campaign, filters spent greater than 3 times the target and results equal to 0 over the last 3 days, execution PAUSE. Use absolute metrics only: Meta rejects cost metrics on ad-level rules in a campaign-budget campaign.
+  1. "CLAUDE | pause dead ads": entity_type AD in this campaign, filters spent greater than pause_multiplier times the target (the interview's number, default 3) and results equal to 0 over the last 3 days, execution PAUSE. Use absolute metrics only: Meta rejects cost metrics on ad-level rules in a campaign-budget campaign.
   2. "CLAUDE | cost alert": entity_type CAMPAIGN scoped to this campaign id, filter cost per result greater than 1.5 times the target over the last 3 days, execution NOTIFICATION.
-  If there is no target cost, skip both and say why.
+  If there is no target cost, skip both, write `meta_rule_ids: none`, and say that autopilot stays unavailable without them.
 - After building, read each object back from the account and confirm it matches the approved plan.
 - Share the campaign, ad set and ad IDs and ad preview links.
 - Write the plan to `ads/CAMPAIGN.md` in this folder, because the check-in starts with no memory of this chat and reads only that file. Use exactly these lines, filled in:
@@ -112,7 +117,14 @@ If they chose restructure or new:
   campaign_name: CLAUDE | ...
   ad_set_id: <id>
   optimization_event: <for example COMPLETE_REGISTRATION>
-  target_cost_per_result: <number in account currency, or "none">
+  target_cost_per_result: <number in whole account currency, or "none">
+  target_roas: <number or "none">
+  aov: <average order value, or "none">
+  result_action_type: <the insights action_type from Step 1b, for example purchase or complete_registration>
+  lead_source: <pixel, form <id>, or "none">
+  result_lag_days: <days until a result is known to be real, default 0>
+  currency: <USD, EUR, JPY...>
+  currency_offset: <100 for USD and EUR, 1 for JPY>
   budget_policy: <fixed, scale or steady>
   daily_budget: <starting daily budget>
   total_budget: <fixed only, else "none">
@@ -120,6 +132,7 @@ If they chose restructure or new:
   daily_ceiling: <scale only, else "none">
   scale_step_pct: <default 20>
   scale_after_days: <default 3>
+  pause_multiplier: <default 3>
   ask_above_daily: <a daily budget, or "never">
   meta_rule_ids: <ids of the Meta safety rules, or "none">
   start_date: <YYYY-MM-DD>
@@ -128,6 +141,8 @@ If they chose restructure or new:
   destination_url: <url>
   url_tags: <utm string or "none">
   excluded_audiences: <names and ids>
+  placements: <all, or the list>
+  brand: <the active brand's slug>
   number_floor: <lowest creative number this campaign may claim, from the operator, or "none">
   account_timezone: <timezone_name from get_account_info>
   mode: <approval or autopilot>
@@ -137,7 +152,7 @@ If they chose restructure or new:
   round: 1
   round_started: <YYYY-MM-DD, set when it goes live>
   takeover: <adopt, refresh, restructure or new>
-  source_campaign_id: <the live campaign adopted, refreshed or replaced, or "none">
+  source_campaign_ids: <the live campaigns adopted, refreshed or replaced, comma-separated, or "none">
   ```
   Read the file back and show it to the operator.
 - Start `ads/LOG.md` if it does not exist, with a first entry in the format the file's header gives (see "The log" below): the date, "Campaign built", every id, the budget and the end date. Every later run appends to this file and reads it first.
@@ -149,7 +164,7 @@ Nothing is activated in this step. Step 6 runs first; Step 7 activates on "turn 
 For every ad: call get_ad_previews for the feed, story and reel placements and list the preview links; fetch the destination with its url_tags from the shell and confirm 200; read the primary text and headline against Meta's Advertising Standards (https://transparency.meta.com/policies/ad-standards/) and this brand's `CHECKLIST.md`, and name any claim that would be rejected or is not backed. Write `ads/checks/launch.md`: one line per ad with `PASS` or `FAIL` and why, and `PASS` or `FAIL` on the first line. In approval mode show the operator the preview links to eyeball and the verdicts. A campaign does not go live while the first line says FAIL.
 
 ## Step 7: "Turn it on"
-Activate nothing until the operator says "turn it on". When they do: set the campaign, its ad set and its ads to ACTIVE through Pipeboard, read them back, confirm each id is live, set `round_started` in `ads/CAMPAIGN.md`, and append a "Turned on" entry to `ads/LOG.md` ("Turned on (adopted)" for an adopted campaign). "Turn it on" is the operator's approval to activate; the PAUSED rule in RULES.md is for ads handed to someone else and does not apply here. The operator should never need to open Ads Manager.
+Activate nothing until the operator says "turn it on". When they do: set the campaign to ACTIVE with update_campaign and each ad whose launch-check line says PASS to ACTIVE with update_ad (the ad set was created active; an ad whose line says FAIL stays paused and is named), read them back, confirm each id is live, set `round_started` in `ads/CAMPAIGN.md`, and append a "Turned on" entry to `ads/LOG.md` ("Turned on (adopted)" for an adopted campaign). "Turn it on" is the operator's approval to activate; the PAUSED rule in RULES.md is for ads handed to someone else and does not apply here. The operator should never need to open Ads Manager.
 Permission warm-up, while the operator is watching, right after it goes live: call create_video_upload_url once (it only returns an upload address) and update_ad on one ad with the status it already has. Claude Code asks the operator about each Pipeboard tool the first time; tell them to choose "Always allow" each time, so an unattended check-in never stops on a permission question. Name any Pipeboard write tool the check-in can use that they have not allowed yet (upload_ad_video_file is allowed the first time a video uploads).
 For restructure, do not pause the old campaign yet: the check-in recommends it once the new one has three days of results at or under the old cost per result, and the operator says "do it". For new alongside a live campaign that overlaps it, repeat the overlap warning and offer to exclude that campaign's audience or pause it.
 Then tell the operator to say "set up the team": that installs the twice-daily check-in, the spend alert, the weekly review and, for a fixed budget, the final report, as scheduled tasks (CLAUDE.md says how).
@@ -160,7 +175,7 @@ If something the operator asks for conflicts with Meta's requirements or with th
 `ads/LOG.md` is the campaign's memory and the record the final report is written from. It starts with this header, then one entry per event, newest last:
 ```
 # Campaign log
-Each entry: ## <YYYY-MM-DD HH:MM> <type>, then plain lines. Types: Campaign built, Turned on, Check-in, Alert, Approved, Changed, Declined, Built, Weekly, Report.
+Each entry: ## <YYYY-MM-DD HH:MM> <type>, then plain lines. Types: Campaign built, Turned on, Check-in, Alert, Approved, Declined, Changed budget, Changed pause, Changed ceiling, Changed status, Built copy, Built video, Weekly, Report, Failed. The kind sits in the heading because rules.py counts the day's changes by it.
 ```
 A "Check-in" entry lists the numbers read, the recommendations, and every copy variant and concept proposed with its one-line hook. An "Approved" entry quotes what the operator named. A "Declined" entry names what the operator turned down or skipped. A "Changed" entry gives the object id, the old value and the new value.
 

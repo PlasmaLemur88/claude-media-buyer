@@ -8,7 +8,7 @@ It can read your last 90 days of ads, write angles and briefs, make the videos, 
 
 ## What you get
 
-You open the folder in Claude Code and say "run my ads". From there it works like three people and a schedule, and every chat starts by telling you where you are ("Stage 4 of 4, Buying. Step 4 of 10: Launch&nbsp;check").
+You open the folder in Claude Code and say "run my ads". From there it works like three people and a schedule, and every chat starts by telling you where you are ("Stage 4 of 4, Buying. Step 4 of 9: Launch&nbsp;check").
 
 1. **Setup, one sitting.** Claude checks your Mac, connects your Meta ad account through Pipeboard, and asks about your brand once.
 2. **The strategist** reads your account's winners, pulls competitor ads and the words your customers use, and comes back with 8 to 12 angles, a test plan and a brief for each concept. You approve the plan.
@@ -55,8 +55,9 @@ Nothing is preset. The interview asks which budget policy you&nbsp;want:
 | Scale while it works | Always on. Raises the daily budget while each of the last few days beats your target, up to a daily ceiling you set, then asks before going&nbsp;higher. |
 | Steady | Always on at the same daily budget. Only cuts when results get&nbsp;worse. |
 
-You also set how big one change may be, how many good days come first, and a
-daily budget above which every raise waits for your yes. These rules run as code
+You also set how big one change may be, how many good days come first, a daily
+budget above which every raise waits for your yes, and how much one ad may spend
+with no result before it is paused. These rules run as code
 (`ads/rules.py`, with tests), not as text Claude could misread. Autopilot is never
 on by default: before it can be, Claude spells out in your own numbers what it
 will do alone and the worst day in dollars, and you type a sentence to accept it.
@@ -70,7 +71,8 @@ and alert you when the campaign's cost runs 50% over&nbsp;target.
 
 - Launch the campaign before you type "turn it&nbsp;on".
 - Spend credits on a new video before you say yes to the cost, or in autopilot, past your daily&nbsp;limit.
-- Change targeting or the ad&nbsp;set.
+- Change targeting or the ad set. The folder's settings deny every connector tool that could, so even an unattended run cannot call&nbsp;them.
+- Act on a reply meant for an older report: every "do it" carries the report's time, and a bare "do it" gets a question&nbsp;back.
 - Pause the last two running ads in the ad set, even in autopilot. It recommends it&nbsp;instead.
 - Change a budget in any way `ads/rules.py` did not return, or go past your
   total, your ceiling or your ask-first&nbsp;line.

@@ -7,7 +7,7 @@ analysis goes back to the strategist, and the next round starts from what was
 learned. Claude plays all three roles. The operator approves.
 
 `python3 ads/status.py` says where a campaign is by reading which files exist, for
-example "Stage 4 of 4, Buying. Step 4 of 10: Launch check." Every session in this
+example "Stage 4 of 4, Buying. Step 4 of 9: Launch check." Every session in this
 folder opens with that line once the operator has asked to run ads, and "run my
 ads" or "continue" picks up at the current step. Nothing is preset: every number,
 limit and choice comes from the operator in stages 2 and 4.
@@ -50,7 +50,7 @@ Stage 4, Buying (`BUILD.md` to launch, then the schedules)
 5. Turn on, the Meta safety rules, and "set up the team": the check-in, the alert, the weekly review and (fixed budgets) the final report, as scheduled tasks.
 6. Monitor and optimize twice a day (`CHECKIN.md`): delivery problems, cost against target, pauses and the one budget change from `rules.py`, tiring ads, the next upload or build from the queue. The alert (`ALERT.md`) watches spend between runs.
 7. Weekly (`WEEKLY.md`): reconcile Meta's count against the real one, audit the account with the `ads-meta` skill, analyze by element, write `LEARNINGS.md`, update the angles, write the next round's briefs. Production then builds them (one a day in autopilot, on "make them" in approval mode).
-8. Report (`REPORT.md`): the full record and a one-page version, at the end of a fixed campaign or on request.
+8. Report (`REPORT.md`): the full record and a one-page version, at the end of a fixed campaign or on request; the end-of-campaign report also removes the scheduled runs, and "new campaign" archives the state and starts the next one from the strategist.
 
 ## Handoffs
 
@@ -61,7 +61,7 @@ Stage 4, Buying (`BUILD.md` to launch, then the schedules)
 
 ## Two modes
 
-Approval, the default: each stage stops where the steps above say "approved", and every change after launch waits for the operator to type "do it".
+Approval, the default: each stage stops where the steps above say "approved", every change after launch waits for the operator to type "do it" with the report's time, and a new round waits for "approved" typed in any chat.
 
 Autopilot: chosen in the build interview (stage 4, step 3). It stays off until two lines exist in `CAMPAIGN.md`: the operator's typed acceptance from `BUILD.md` Step 4b ("I accept the autopilot risk") and the ids of the two Meta safety rules; `rules.py` checks both before it reports mode autopilot. Then, after "turn it on", the check-in and the weekly review run on their own inside the limits in `CHECKIN.md` STEP 7 and the autopilot exception at the end of `RULES.md`: pauses and the one budget change the rules return, one copy variant a day, the next queued brief built one a day within the credit limit, and new videos held for the operator's look unless they chose "launch". "Autopilot off" in any chat ends it.
 
