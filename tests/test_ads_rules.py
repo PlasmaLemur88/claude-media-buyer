@@ -252,5 +252,18 @@ with tempfile.TemporaryDirectory() as d:
     lg = PL.Path(d) / "LOG.md"; lg.write_text("# Campaign log\n## 2026-11-12 09:00 Campaign built\nthe video ads and ids\n")
     check("a Campaign built entry is not the day's video", R.log_today(lg, "2026-11-12")["video"] == 0)
 
+# --- the fourth review: the cap block is guarded
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "1.50", "daily_budget": "1000"}, dict(base, current_daily_budget=100000, spend_cap=31000, spend_lifetime=28500, daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("a budget in cents leaves the cap alone", o["cap_to"] is None)
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "1.50"}, dict(base, spend_cap=31000, spend_lifetime=2850000, daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("a lifetime spend in cents leaves the cap alone", o["cap_to"] is None and any("units" in n for n in o["notes"]))
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "1.50"}, dict(base, current_daily_budget="", spend_cap=31000, spend_lifetime=31000, daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("no daily budget means an ask, not a zero extension", o["cap_to"] is None and any("raise cap to" in q for q in o["ask"]))
+o = R.decide({"budget_policy": "fixed", "target_cost_per_result": "1.50", "total_budget": "12000", "end_date": "2026-11-20"}, dict(base, spend_to_date=8000, spend_cap=12000, spend_lifetime=25000, daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("an adopted fixed campaign stopped by its old spend gets the cap moved", o["cap_to"] == 29000)
+with tempfile.TemporaryDirectory() as d:
+    lg = PL.Path(d) / "LOG.md"; lg.write_text("# Campaign log\n## 2026-11-12 Built video (autopilot)\npaths\n")
+    check("a Built heading without a time still counts", R.log_today(lg, "2026-11-12")["video"] == 1)
+
 print(f"\n  {run - fails} passed, {fails} failed")
 sys.exit(1 if fails else 0)

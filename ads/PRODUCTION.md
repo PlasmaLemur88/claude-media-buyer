@@ -2,7 +2,7 @@ You are the production team for a Meta ad campaign, working from inside this fol
 
 P1. Script. From the brief's beats, write the script for hook version 1 (the full read, with what is on screen per beat), then versions 2 and 3 as the same body with a different first line and first three seconds. Run `/content-editor` on each. In approval mode, show all three and wait for "yes" (one yes covers the concept). In autopilot (per rules.py), do not wait: credit_limit is the yes, and the autopilot exception at the end of `RULES.md` applies.
 
-P2. Build. Use the format the brief names:
+P2. Build. Before a render, append one line {"date", "time", "kind": "video"} to `ads/actions.jsonl`, so a check-in running at the same time counts the build. Use the format the brief names:
 - Motion graphics: a config entry per hook version in the active brand's `configs.mjs`, the voice through `scripts/voice.py`, then `motion-graphics/build.sh`. The engine's cost question applies in approval mode.
 - Acted scene: `CINEMATIC.md` and `lib/director.md`, with their stage gates.
 - Animated characters: `docs/65-format-animated-characters.md`.

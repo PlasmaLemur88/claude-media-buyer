@@ -88,8 +88,7 @@ def log_today(p, date, actions=None):
             body = b.lower()
             if "budget" in head or (("changed" in head or "approved" in head) and re.search(r"daily[ _]?budget[^\n]*(->|to [$€£¥₩₹0-9])", body)):
                 counts["budget"] += 1
-            parts = head.split(None, 2)
-            kind = parts[2] if len(parts) > 2 else head
+            kind = re.sub(r"^\S+\s+(\d{1,2}:\d{2}\s+)?", "", head)
             if kind.startswith("built"):
                 if "copy" in kind or ("video" not in kind and "copy variant" in body):
                     counts["copy"] += 1
@@ -205,17 +204,28 @@ def decide(plan, today, logc):
         out["notes"].append("total reached: no budget change")
         return finish()
 
-    # 0. the Meta spend cap is a lifetime cap; an always-on campaign must not run into it
+    # 0. the Meta spend cap is a lifetime cap; a campaign must not run into it unseen
+    plan_daily = num(plan.get("daily_budget"))
+    units_ok = not (plan_daily and budget and not (0.5 * plan_daily <= budget <= 2 * plan_daily))
     cap = num(today.get("spend_cap"))
+    cap = cap if cap and cap > 0 else None
     life = num(today.get("spend_lifetime"))
-    if cap and cap > 0 and life is not None and policy in ("scale", "steady"):
+    if cap and life is not None:
         month = 31 * (ceiling if (policy == "scale" and ceiling) else budget)
-        if life >= cap:
-            out["cap_to"] = round(life + month)
-            out["ask"].append(f"The Meta spend cap ({fmt(cap)}) is reached, so the campaign is stopped. Autopilot extends it by a month of budget; otherwise reply 'raise cap to {out['cap_to']:,.0f}'.")
-        elif life >= 0.9 * cap:
-            out["cap_to"] = round(life + month)
-            out["ask"].append(f"{fmt(life)} of the {fmt(cap)} Meta spend cap is spent. Autopilot extends it by a month of budget; otherwise reply 'raise cap to {out['cap_to']:,.0f}'.")
+        if life > 1.5 * (cap + (spent if policy == "fixed" else 0)) or cap > 3 * (life + max(month, 1)):
+            out["notes"].append(f"spend_cap {fmt(cap)} and spend_lifetime {fmt(life)} do not fit together, a units mix-up; the cap is left alone this run")
+        elif not units_ok:
+            out["notes"].append("the budget units look wrong, so the Meta spend cap is left alone this run")
+        elif policy in ("scale", "steady") and life >= 0.9 * cap:
+            if month <= 0:
+                out["ask"].append(f"{fmt(life)} of the {fmt(cap)} Meta spend cap is spent and no daily budget was read; reply 'raise cap to <amount>'.")
+            else:
+                out["cap_to"] = round(min(life, cap) + month)
+                state = "is reached, so the campaign is stopped" if life >= cap else "is nearly spent"
+                out["ask"].append(f"The Meta spend cap ({fmt(cap)}) {state}: {fmt(life)} spent since the campaign began. Autopilot extends it by a month of budget; otherwise reply 'raise cap to {out['cap_to']:,.0f}'.")
+        elif policy == "fixed" and total and not spent_missing and life >= cap and spent < total:
+            out["cap_to"] = round(life - spent + total)
+            out["ask"].append(f"The Meta spend cap ({fmt(cap)}) is reached before the total ({fmt(spent)} of {fmt(total)} spent in this campaign), because the cap counts spend from before adoption. Autopilot moves it to {out['cap_to']:,.0f}; otherwise reply 'raise cap to {out['cap_to']:,.0f}'.")
 
     # 1. pauses
     tot_spend = sum(num(a.get("spend_7d"), 0) or 0 for a in ads)
@@ -270,8 +280,6 @@ def decide(plan, today, logc):
             and (num(r.get("spend"), 0) or 0) / (num(r.get("results"), 0) or 1) < target for r in recent)
         week_roas = None
     week = cpr(daily) if daily else None
-    plan_daily = num(plan.get("daily_budget"))
-    units_ok = not (plan_daily and budget and not (0.5 * plan_daily <= budget <= 2 * plan_daily))
     new, why = None, None
     if not daily:
         out["notes"].append("no full days of numbers yet; no budget change")
