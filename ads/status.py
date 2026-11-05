@@ -97,7 +97,7 @@ def main():
             ("Tracking check", passed("checks/tracking.md")),
             ("Campaign built or adopted", bool(p.get("campaign_id"))),
             ("Launch check", passed("checks/launch.md")),
-            ("Turned on", "Turned on" in log),
+            ("Turned on", bool(re.search(r"(?m)^## \d{4}-\d{2}-\d{2} \d{2}:\d{2} Turned on", log))),
             ("Twice-daily check-in scheduled", task("CHECKIN.md")),
             ("Spend alert scheduled", task("ALERT.md")),
             ("Weekly review scheduled", task("WEEKLY.md")),
