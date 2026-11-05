@@ -59,7 +59,7 @@ A missing optional key is not a blocker. Tell them what it unlocks and carry on.
 Once the operator has asked to run ads (anything exists in `ads/` beyond the shipped
 files, or `ads/CAMPAIGN.md` exists), start every session by running
 `python3 ads/status.py --short` and showing its line, for example "Stage 4 of 4,
-Buying. Step 4 of 10: Launch check." Then offer the next step. "Run my ads" and
+Buying. Step 4 of 9: Launch check." Then offer the next step. "Run my ads" and
 "continue" mean: do the step that line names, with the prompt `ads/WORKFLOW.md`
 maps it to. When the operator asks how complete things are, run
 `python3 ads/status.py` and show the full list; the optional pieces say what each
@@ -213,17 +213,34 @@ sign-ins. `ads/LOG.md` is the memory every run appends to.
   <the absolute path of this folder>, then follow ads/<file> exactly." The tasks:
   the check-in (`CHECKIN.md`) at 09:00 and 18:00 local time; the spend alert
   (`ALERT.md`) at 12:00, 15:00 and 21:00 (each run opens a chat in the sidebar, so not
-  hourly); the weekly review (`WEEKLY.md`) at 10:00 on the launch weekday; and, for a
-  fixed budget, the final report (`REPORT.md`) once, at 09:00 the day after end_date
-  (fireAt). Run the check-in once right away and show the result, so the first failure
+  hourly); the weekly review (`WEEKLY.md`) at 10:00 on the launch weekday, first run a week after
+  launch; and, for a fixed budget, the final report (`REPORT.md`) once, at 09:30 the day
+  after end_date (fireAt), which also removes the other three tasks. Run the check-in once right away and show the result, so the first failure
   happens while the operator is watching. Tasks run only while the Claude app is open.
 - **"Make them"**: run `ads/PRODUCTION.md` on the briefed queue. **"Weekly review"**:
   run `ads/WEEKLY.md` now. **"Write the campaign report"**: run `ads/REPORT.md` now.
-- **"Launch it"** typed in any chat: find the newest "Built, waiting for your look"
-  entry in `ads/LOG.md`, upload those files and switch the ads on by `ads/CHECKIN.md`
-  STEP 6, and log a Changed entry.
+- **Replies to a report, typed in any chat**: "do it <numbers> @<time>", "show <n>",
+  "undo <n>", "pause <ad name>", "pause the campaign", "resume the campaign", "raise
+  total to <X>", "raise ceiling to <X>", "set ceiling to <X>" and "the cut is good" all
+  go through `ads/CHECKIN.md` STEP 6, which reads the newest Check-in entry in
+  `ads/LOG.md` first.
+- **"Launch it"** typed in any chat: find the newest "Built video ... waiting for your
+  look" entry in `ads/LOG.md`, upload those files and switch the ads on by
+  `ads/CHECKIN.md` STEP 6, and log a Changed status entry.
+- **"Approved"** typed in any chat after a weekly review: change the newest
+  `round <N> approved: pending` line in `ads/TEST-PLAN.md` to yes, set `round: <N>` and
+  `round_started: <today>` in `ads/CAMPAIGN.md`, log it, and say "make them" starts
+  production.
 - **"Autopilot off"** typed in any chat: set `mode: approval` in `ads/CAMPAIGN.md`,
-  add a Changed entry to `ads/LOG.md`, and confirm in one line.
+  add a Changed status entry to `ads/LOG.md`, and confirm in one line.
+- **"Stand down the team"**: delete this folder's check-in, spend alert, weekly review
+  and report scheduled tasks, log a Changed status entry, confirm in one line. The final
+  report of a fixed campaign does this itself.
+- **"New campaign"**: move everything in `ads/` that one campaign leaves behind (the plan,
+  the log, the brief, research, angles, test plan, briefs, checks, DELIVERED.md,
+  today.json, takeover.json, actions.jsonl, the reports) into `ads/archive/<campaign
+  name>/`, keep `ads/LEARNINGS.md` where it is, then start at `ads/STRATEGY.md` S1, which
+  may copy answers from the archived brief.
 - Every ad production makes goes through the same gates as any other ad: script
   approval, a yes before credits, the checks, the video-reviewer. The one exception
   is autopilot (end of `RULES.md`, `ads/CHECKIN.md` STEP 7), which builds the next

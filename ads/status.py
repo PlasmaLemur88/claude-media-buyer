@@ -34,6 +34,7 @@ def main():
     ap.add_argument("--root", default=str(pathlib.Path(__file__).resolve().parent.parent))
     ap.add_argument("--cfg", default=str(pathlib.Path.home() / ".claude.json"))
     ap.add_argument("--tasks", default=str(pathlib.Path.home() / ".claude" / "scheduled-tasks"))
+    ap.add_argument("--today", default=None, help="YYYY-MM-DD, for tests; defaults to this machine's date")
     a = ap.parse_args()
     root = pathlib.Path(a.root); ads = root / "ads"
     p = plan(ads)
@@ -52,7 +53,7 @@ def main():
     def task(name):
         for f in pathlib.Path(a.tasks).glob("*/SKILL.md"):
             t = read(f)
-            if name in t and (str(root) in t or "ads/" in t):
+            if name in t and str(root) in t:
                 return True
         return False
 
@@ -66,6 +67,7 @@ def main():
         ("Setup", [
             ("Meta connected (Pipeboard)", "pipeboard" in cfg or bool(p) or passed("checks/tracking.md")),
             ("Brand guide and checklist", bool(cur) and (root / "brands" / cur / "CHECKLIST.md").exists()),
+            ("Write guard (the Pipeboard deny list in .claude/settings.json)", "mcp__pipeboard__update_adset" in read(root / ".claude" / "settings.json")),
         ]),
         ("Strategy", [
             ("Brief", (ads / "BRIEF.md").exists()),
@@ -86,7 +88,6 @@ def main():
             ("Twice-daily check-in scheduled", task("CHECKIN.md")),
             ("Spend alert scheduled", task("ALERT.md")),
             ("Weekly review scheduled", task("WEEKLY.md")),
-            ("First weekly reconcile", any((ads / "checks").glob("reconcile-*.md")) if (ads / "checks").exists() else False),
         ] + ([("Final report scheduled", task("REPORT.md"))] if fixed else [])),
     ]
     extras = [
@@ -99,9 +100,19 @@ def main():
         extras.append(("Meta safety rules", p.get("meta_rule_ids", "none") not in ("", "none"),
                        "dead ads keep spending while your Mac is off"))
     if auto:
-        extras.append(("Autopilot risk accepted in writing", "i accept the autopilot risk" in p.get("autopilot_accepted", "").lower(),
+        extras.append(("Autopilot risk accepted in writing", bool(re.match(r'^\d{4}-\d{2}-\d{2}[^"]*"i accept the autopilot risk"$', p.get("autopilot_accepted", "").strip().lower())),
                        "autopilot acts as approval mode until you accept it"))
 
+    import datetime
+    today = a.today or datetime.date.today().isoformat()
+    end = p.get("end_date", "none")
+    reports = sorted(ads.glob("REPORT-*.md"))
+    ended = fixed and bool(p.get("campaign_id")) and ((re.match(r"\d{4}-\d{2}-\d{2}$", end) and today > end) or bool(reports))
+    if ended:
+        line = f"Campaign ended ({end}); report {'written' if reports else 'due'}. Say 'new campaign' to start another."
+        if a.short:
+            print(line); return
+        print(line); return
     total_stages = len(stages)
     for si, (sname, steps) in enumerate(stages):
         for ti, (tname, done) in enumerate(steps):

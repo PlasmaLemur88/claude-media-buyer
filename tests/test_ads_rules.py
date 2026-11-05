@@ -82,7 +82,7 @@ check("autopilot without acceptance acts as approval", o["mode"] == "approval" a
 au2 = dict(au, autopilot_accepted='2026-11-05, "I accept the autopilot risk"', meta_rule_ids="none")
 o = R.decide(au2, dict(base, daily=days(1000, 800), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
 check("autopilot without Meta rules acts as approval", o["mode"] == "approval")
-au3 = dict(au2, meta_rule_ids="111, 222")
+au3 = dict(au2, meta_rule_ids="120255000000001, 120255000000002", autopilot_credit_limit_per_day="40")
 o = R.decide(au3, dict(base, daily=days(1000, 800), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
 check("autopilot with both is on", o["mode"] == "autopilot" and o["autopilot_today"]["video"])
 
@@ -106,6 +106,69 @@ o = R.takeover(dict(T0, campaigns=[]))
 check("empty account: new", o["account"]["call"] == "new")
 o = R.takeover(dict(T0, campaigns=[camp(), camp(id="c2", name="two", event="PURCHASE")], overlaps=[{"a": "c1", "b": "c2", "pct": 45}]))
 check("overlap over 30% warns", len(o["warnings"]) == 1 and o["account"]["campaign_id"] == "c1")
+
+# the pause line comes from the interview; the default is 3x the target
+p2 = {"budget_policy": "steady", "target_cost_per_result": "400", "pause_multiplier": "1.5"}
+o = R.decide(p2, dict(base, current_daily_budget=1142, daily=days(1142, 3), ads=ads((650, 0), (3000, 8), (2000, 6))), NOLOG)
+check("pause_multiplier 1.5 pauses a $650 no-result ad at a $400 target", [x["id"] for x in o["pauses"]] == ["0"])
+o = R.decide(dict(p2, pause_multiplier="3"), dict(base, current_daily_budget=1142, daily=days(1142, 3), ads=ads((650, 0), (3000, 8), (2000, 6))), NOLOG)
+check("the default 3x does not pause it", o["pauses"] == [])
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "400"}, dict(base, current_daily_budget=1142, daily=days(1142, 3), ads=ads(*([(350, 0)] * 20 + [(1000, 3)]))), NOLOG)
+check("an unreachable pause line is named", any("pause line" in n for n in o["notes"]))
+# today's partial day never counts
+o = R.decide(p, dict(base, daily=days(1000, 700) + [{"date": "2026-11-12", "spend": 400, "results": 0}], ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("today's partial day is ignored", o["budget"] is not None and o["budget"]["to"] == 1200)
+o = R.takeover(dict(T0, campaigns=[camp(), camp(id="c2", name="two")], overlaps=[{"a": "c1", "b": "c2", "shared": ["Free subscribers"]}]))
+check("a shared saved audience warns", len(o["warnings"]) == 1 and "same saved audiences" in o["warnings"][0])
+
+# --- what the safety review broke, now held
+ps = {"budget_policy": "scale", "target_cost_per_result": "1.50", "daily_ceiling": "none", "ask_above_daily": "never"}
+o = R.decide(ps, dict(base, current_daily_budget=50000, daily=days(50000, 40000), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("scale with no ceiling never raises, asks for one", o["budget"] is None and any("ceiling" in q for q in o["ask"]))
+o = R.decide(dict(ps, daily_ceiling="3000", ask_above_daily="1100 a day"), dict(base, daily=days(1000, 800), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("an unreadable ask-first line means every raise asks", o["budget"] and o["budget"]["needs_approval"])
+pa = {"budget_policy": "steady", "target_cost_per_result": "1.50", "mode": "autopilot",
+      "autopilot_accepted": 'not yet; the sentence to type is "I accept the autopilot risk"', "meta_rule_ids": "skipped, no target cost"}
+o = R.decide(pa, dict(base, daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("a quoted sentence inside other text does not accept the risk", o["mode"] == "approval")
+o = R.decide(dict(pa, autopilot_accepted='2026-11-05, "I accept the autopilot risk"'), dict(base, daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("words in meta_rule_ids are not rule ids", o["mode"] == "approval")
+o = R.decide(dict(pa, autopilot_accepted='2026-11-05, "I accept the autopilot risk"', meta_rule_ids="120255000000001, 120255000000002", autopilot_credit_limit_per_day="none"),
+             dict(base, daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("autopilot with no credit limit builds no video", o["mode"] == "autopilot" and not o["autopilot_today"]["video"] and o["autopilot_today"]["copy_variant"])
+o = R.decide(dict(pa, autopilot_accepted='2026-11-05, "I accept the autopilot risk"', meta_rule_ids="120255000000001", autopilot_credit_limit_per_day="25"),
+             dict(base, daily=days(1000, 700), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("a credit limit is passed through", o["credit_limit"] == 25 and o["autopilot_today"]["video"])
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "1.50"}, dict(base, daily=days(1000, 0), ads=ads((2333, 0), (2333, 0), (2333, 0))), NOLOG)
+check("seven days with no results cuts and asks to pause", o["budget"] and o["budget"]["to"] == 800 and any("Pause the campaign" in q for q in o["ask"]))
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "1.50", "ask_above_daily": "1100"}, dict(base, current_daily_budget=1500, daily=days(1500, 500), ads=ads((3000, 1000), (2000, 700))), NOLOG)
+check("a cut never waits on the ask-first line", o["budget"] and o["budget"]["to"] == 1200 and not o["budget"]["needs_approval"])
+o = R.decide({"budget_policy": "fixed", "target_cost_per_result": "1.50", "total_budget": "10000", "end_date": "2026-11-20"}, dict(base, spend_to_date=10500, daily=days(1000, 800), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("total reached: no budget, asks to pause", o["budget"] is None and any("Total reached" in q for q in o["ask"]))
+o = R.decide({"budget_policy": "fixed", "target_cost_per_result": "1.50", "total_budget": "10000", "end_date": "none"}, dict(base, spend_to_date=9500, daily=days(1000, 800), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("fixed with no end date never raises past what is left", o["budget"] is None and any("end date" in q for q in o["ask"]))
+o = R.decide(p, dict(base, daily=days(1000, 700), ads=[{"id": "1", "name": "new", "status": "ACTIVE", "spend_7d": 5, "results_7d": 0, "days_running": 0}] + ads((3000, 2000), (2000, 1500))), NOLOG)
+check("an ad in its first day is not paused", o["pauses"] == [])
+o = R.decide(dict(p, scale_after_days="0"), dict(base, daily=[], ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("no days of numbers: no raise", o["budget"] is None)
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "-1.50"}, dict(base, daily=days(1000, 700), ads=ads((0, 0), (3000, 2000), (2000, 1500))), NOLOG)
+check("a negative target is treated as none", o["pauses"] == [] and o["budget"] is None)
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "30", "currency": "EUR"}, dict(base, daily=days(1000, 40), ads=ads((100, 10), (300, 10), (700, 10))), NOLOG)
+check("an ad at target is not paused on the average rule; one at twice target is", [x["id"] for x in o["pauses"]] == ["2"] and "€" in o["pauses"][0]["why"])
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "1.50", "daily_budget": "1000"}, dict(base, current_daily_budget=100000, daily=days(100000, 500), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("a units mix-up blocks budget changes", o["budget"] is None and any("units" in n for n in o["notes"]))
+o = R.decide({"budget_policy": "fixed", "target_cost_per_result": "1.50", "total_budget": "10000", "end_date": "Nov 18 2026"}, dict(base, daily=days(1000, 800), ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("a bad end date is named, not crashed on", any("end_date" in n for n in o["notes"]))
+import tempfile, pathlib as PL
+with tempfile.TemporaryDirectory() as d:
+    lg = PL.Path(d) / "LOG.md"; lg.write_text("# Campaign log\n## 2026-11-12 09:30 Approved\nbudget 1000 -> 1200\n")
+    check("an Approved entry about the budget counts as today's change", R.log_today(lg, "2026-11-12")["budget"] == 1)
+    ac = PL.Path(d) / "actions.jsonl"; ac.write_text('{"date": "2026-11-12", "kind": "copy", "id": "9"}\n')
+    check("an attempted write in actions.jsonl counts", R.log_today(PL.Path(d) / "none.md", "2026-11-12", ac)["copy"] == 1)
+o = R.takeover(dict(T0, campaigns=[camp(id="c1", budget_level="adset", n_adsets=4), camp(id="c2", name="two", budget_level="adset", n_adsets=5)]))
+check("several restructure campaigns are all listed", o["account"]["call"] == "restructure" and o["account"]["campaign_ids"] == ["c1", "c2"])
+o = R.takeover(dict(T0, wanted_event="", campaigns=[camp(event="PURCHASE")]))
+check("take stock without a goal warns", any("wanted_event" in w for w in o["warnings"]))
 
 print(f"\n  {run - fails} passed, {fails} failed")
 sys.exit(1 if fails else 0)
