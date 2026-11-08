@@ -2,20 +2,31 @@
 
 ![Claude makes your Meta ads and runs them. From How to AI.](assets/cover.jpg)
 
-We built this in a day, on 4 November 2026, because Ruben Hassid wanted to spend $10,000 on Meta ads for How to AI and let Claude run the whole thing, for a newsletter post about it. There was no media buyer on the job, no strategist and no production team, so the question was how much of their work Claude Code could do if you handed it the ad account, the brand and a folder of&nbsp;rules.
+**Claude runs your Meta ads.** It writes them, makes the videos, launches the campaign and checks it twice a day, so you don't need to open Ads&nbsp;Manager.
 
-It can read your last 90 days of ads, write angles and briefs, make the videos, build the campaign paused, check that your pixel fires, preview every placement, and then check in twice a day with a short list of decisions for you. What it cannot do is watch a video or hear a voice. So a second Claude reviews every file against your brand's checklist, and the first thing that reviewer did was fail one of our own old ads on six counts, including text sitting where the Reels buttons go and a reader count that was out of&nbsp;date.
+## How it works
 
-## What you get
+1. Open this folder in Claude Code and say **run my ads**.
+2. Tell it what you sell, your budget and the cost per sale or signup you can live&nbsp;with.
+3. Type **turn it&nbsp;on**.
 
-You open the folder in Claude Code and say "run my ads". From there it works like three people and a schedule, and every chat starts by telling you where you are ("Stage 4 of 4, Buying. Step 4 of 9: Launch&nbsp;check").
+Twice a day it says what to pause, cut or launch. Reply **do it**, or switch on autopilot and it acts inside your&nbsp;limits.
 
-1. **Setup, one sitting.** Claude checks your Mac, connects your Meta ad account through Pipeboard, and asks about your brand once.
-2. **The strategist** reads your account's winners, pulls competitor ads and the words your customers use, and comes back with 8 to 12 angles, a test plan and a brief for each concept. You approve the plan.
-3. **The production team** turns each brief into a video, three hook versions and a static. Motion graphics, an acted scene with people who talk, or animated characters, whichever the brief asks for.
-4. **The media buyer** builds the campaign paused, runs the tracking and launch checks, and turns it on when you say so. Then, twice a day: what to pause, one budget change, which ads are tiring, what to upload next. Once a week it compares Meta's numbers with your real signups or sales, audits the account against the 72 Meta controls that ship with it, writes down what it learned, and briefs the next&nbsp;round.
+## What you need
 
-You never open Ads Manager. Anything that touches money waits for you to type "do it", unless you choose autopilot, and even then it stays inside the limits you gave it in the&nbsp;interview.
+- [Claude Code](https://claude.com/claude-code)
+- A [Pipeboard](https://pipeboard.co) account, which connects Claude to your Meta ad&nbsp;account
+
+Videos are optional. Claude asks for an API key, for example for a video tool, only when a task needs&nbsp;one.
+
+## What keeps your money safe
+
+Nothing spends until you type turn it on. Your spending limits run as tested code, your Meta account carries its own spend cap as a second stop, and Claude cannot change who sees your ads or delete anything, because the folder blocks those&nbsp;tools.
+
+**Status:** tested end to end on a fake ad account in all three modes (ask first, autopilot that holds new videos, full autopilot), with every change checked. It has not run on a live account yet, and How to AI will be the&nbsp;first.
+
+<details>
+<summary><b>More:</b> how it compares, budget options, taking over live campaigns, what is in the folder, credits</summary>
 
 ## How it is different
 
@@ -78,11 +89,6 @@ and alert you when the campaign's cost runs 50% over&nbsp;target.
 - Change a budget in any way `ads/rules.py` did not return, or go past your
   total, your ceiling or your ask-first&nbsp;line.
 
-## Status
-
-Not yet run end to end on a live campaign. Ruben is running it first: $10,000
-on US free subscribers for How to AI, $1,000 a day for 10 days. We will post his results here when the campaign ends, good or&nbsp;bad.
-
 ## Pipeboard or Meta's own connector
 
 This engine talks to Meta through [Pipeboard](https://pipeboard.co) today. Meta now
@@ -102,27 +108,6 @@ For one person running their own account, Meta's connector is the simpler
 choice, and the only gap is the video upload: an autopilot video has to be put
 at a public link before Meta can take it. Support for Meta's connector is not in
 this engine yet; the prompts in `ads/` are written for Pipeboard's tool&nbsp;names.
-
-## What you need
-
-| What | Why | Where |
-|---|---|---|
-| A Pipeboard account (ads) | the connection to your Meta ad account | https://pipeboard.co |
-| A video provider (some new videos only) | None for animated-text videos voiced by you. A Gemini or fal key for a generated voice; Replicate, fal or Higgsfield for generated footage and stills. Claude asks only when a job needs&nbsp;one. | aistudio.google.com, fal.ai, replicate.com, higgsfield.ai |
-| A Google AI key (optional) | Gemini voices, watching videos, Nano Banana images | https://aistudio.google.com/apikey |
-| A Kling account (acted scenes) | dialogue video, added to Claude as a connector | Claude walks you through it |
-| ffmpeg | every render | needs your Mac password once, Claude gives you the command |
-| Node.js 18+ | motion graphics | https://nodejs.org |
-
-To run ads you need only the first row. The rest are for making new videos.
-Say "how complete is my setup?" any time: Claude scores what is connected and
-says what each missing piece costs&nbsp;you.
-
-Keys go in `.env` (Claude creates it from `.env.example`). Never paste a key
-into a chat. Each person uses their own&nbsp;accounts.
-
-`python3 scripts/doctor.py` checks all of it and names the fix for anything
-missing. It never spends&nbsp;money.
 
 ## What is in here
 
@@ -171,3 +156,5 @@ Meta audit skill and its reference files from AgriciDaniel/claude-ads v2.1.0 (MI
 Claude cannot watch motion or hear audio, so whether an ad looks right and
 sounds like a person stays with you. A green check means no rule was broken. It
 never means the ad is&nbsp;good.
+
+</details>
