@@ -19,7 +19,7 @@ Twice a day it says what to pause, cut or launch. Reply **do it**, or switch on 
 
 Videos are optional. Claude asks for an API key, for example for a video tool, only when a task needs&nbsp;one.
 
-## What keeps your money safe
+## Spending limits
 
 Nothing spends until you type turn it on. Your spending limits run as tested code, your Meta account carries its own spend cap as a second stop, and Claude cannot change who sees your ads or delete anything, because the folder blocks those&nbsp;tools.
 
