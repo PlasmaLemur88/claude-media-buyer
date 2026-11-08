@@ -4,3 +4,5 @@
 - `.claude/skills/banana` is from AgriciDaniel/claude-banana (MIT).
 - `.claude/skills/ads-meta` is the Meta slice of AgriciDaniel/claude-ads v2.1.0 (MIT); its LICENSE and NOTICE.md list what changed.
 - `.claude/skills/competitive-ads-extractor` and `.claude/skills/video-downloader` are from ComposioHQ/awesome-claude-skills (Apache 2.0).
+
+Everything else in this repo is under the MIT license in `LICENSE`. Each bundled skill keeps its own license file, and that license covers its folder.
