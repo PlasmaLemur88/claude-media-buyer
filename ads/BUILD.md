@@ -66,9 +66,12 @@ Call get_pixels: the pixel's last_fired_time must be within the last 24 hours. T
 **Naming**
 - The campaign name must start with "CLAUDE | ". For the ad set and ads, is there a naming convention to follow? If not, propose one based on the existing campaigns in the account.
 
-**Approval or autopilot**
-- Approval mode (the default): every change after launch waits for the operator to type "do it".
-- Autopilot: Claude acts on its own inside limits. If the operator asks for it, ask for the daily credit limit for new videos and whether new videos wait for their look ("hold", the default) or go live unseen ("launch"), then do Step 4b before writing `mode: autopilot`. Autopilot is never switched on by a default or a shrug.
+**Approval or autopilot** (always ask this; give the three choices and the two risks in plain words, then let the operator pick)
+- 1. Ask first (approval, the default): every change after launch waits for the operator to type "do it". The safest choice; it costs them a reply twice a day.
+- 2. Autopilot, videos wait: Claude pauses ads, moves the daily budget once a day and adds one copy variant a day on its own; each new video waits until the operator says "launch it".
+- 3. Full autopilot: the same as 2, and new videos also go live without a person watching them.
+- Say both risks of 2 and 3 before they pick. Creative quality: copy variants, and in 3 the videos too, reach the feed checked only by the brand checklist and the reviewer agent, which can miss a wrong claim, a mispronounced name or an off-brand line; Meta can also reject such an ad or flag the account for a policy breach. Changes that come fast: a budget change a day, pauses and new ads can each restart Meta's learning period, so results swing, and a bad day is acted on before anyone looks; the money rules cap the size of each change, but they cannot judge taste.
+- For 2 or 3: ask for the daily credit limit for new videos, set autopilot_video to hold (2) or launch (3), then do Step 4b before writing `mode: autopilot`. Autopilot is never switched on by a default or a shrug.
 
 **Creative numbers**
 - New creatives get a three-digit number in the file and ad name. Take number_floor from `ads/BRIEF.md` when the strategist recorded it; otherwise ask for the lowest number this campaign should use, so it never collides with numbers the operator's team uses elsewhere, and save it as number_floor (100 if they have none).
