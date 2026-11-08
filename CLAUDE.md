@@ -45,7 +45,10 @@ Four things you cannot do for them. Hand each one over plainly:
 - **Node.js**, if missing, is a normal Mac installer from https://nodejs.org.
 - **Their API keys** go into `.env`, never into the chat. A key in a chat log is
   a key they have to rotate. `.env.example` says where to get each one and what
-  it unlocks. Replicate and fal are needed; Gemini is optional.
+  it unlocks. None is needed to run ads or to render motion graphics. A voice for a new
+  video needs one of: the operator's own recording, a Gemini key or a fal key. Replicate
+  is only for generated footage, generated stills and animated characters. Never ask for
+  a key before a job needs it, and then ask only for that one.
 - **Kling** is an entry in their Claude config, not a key, and its tools only
   appear in a session started AFTER the entry exists. Warn them about the
   restart before you make the edit, not after.

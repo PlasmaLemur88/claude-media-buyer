@@ -108,7 +108,7 @@ this engine yet; the prompts in `ads/` are written for Pipeboard's tool&nbsp;nam
 | What | Why | Where |
 |---|---|---|
 | A Pipeboard account (ads) | the connection to your Meta ad account | https://pipeboard.co |
-| A video provider (new videos only) | fal, Replicate or Higgsfield. Prices work differently, so pick what suits you. This engine's voice and lip-sync scripts call fal; its stills and generated footage call&nbsp;Replicate. | fal.ai, replicate.com, higgsfield.ai |
+| A video provider (some new videos only) | None for animated-text videos voiced by you. A Gemini or fal key for a generated voice; Replicate, fal or Higgsfield for generated footage and stills. Claude asks only when a job needs&nbsp;one. | aistudio.google.com, fal.ai, replicate.com, higgsfield.ai |
 | A Google AI key (optional) | Gemini voices, watching videos, Nano Banana images | https://aistudio.google.com/apikey |
 | A Kling account (acted scenes) | dialogue video, added to Claude as a connector | Claude walks you through it |
 | ffmpeg | every render | needs your Mac password once, Claude gives you the command |

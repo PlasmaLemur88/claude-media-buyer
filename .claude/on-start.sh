@@ -10,11 +10,8 @@ command -v ffmpeg >/dev/null 2>&1 || _missing="$_missing ffmpeg"
 command -v node >/dev/null 2>&1 || _missing="$_missing node"
 python3 -c "import numpy,scipy,PIL,whisper" >/dev/null 2>&1 || _missing="$_missing python-packages"
 [ -d motion-graphics/node_modules/remotion ] || _missing="$_missing remotion-packages"
-for k in REPLICATE_API_TOKEN FAL_KEY; do
-  grep -q "^$k=.\+" .env 2>/dev/null || _missing="$_missing $k"
-done
 if [ -n "$_missing" ]; then
-  echo "0. NOT READY:$_missing (fal and Replicate keys are only needed for new videos)"
+  echo "0. NOT READY:$_missing"
   echo "   Run: bash setup.sh   (do it yourself - the operator should not need a terminal; never in a scheduled run)"
   echo "   Full check: python3 scripts/doctor.py"
   echo

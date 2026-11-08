@@ -54,9 +54,7 @@ for k in REPLICATE_API_TOKEN FAL_KEY; do
   if grep -q "^$k=.\+" .env 2>/dev/null; then
     echo "     $k present"
   else
-    echo "     .env needs $k. Where to get it is written next to it in .env."
-    echo "     Paste it after $k= in .env. Do NOT paste a key into chat."
-    fail=1
+    echo "     $k empty: fine. Only needed for one kind of new video; ask when a job needs it."
   fi
 done
 grep -q "^GEMINI_API_KEY=.\+" .env 2>/dev/null \

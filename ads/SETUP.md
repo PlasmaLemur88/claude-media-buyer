@@ -44,7 +44,9 @@ clients keeps five copies of the folder, each with its own scheduled tasks.
 
 ## 3. Optional, skip any of them
 
-- **A video provider**, only to make new videos: fal, Replicate or Higgsfield.
+- **A video provider**, only to make new videos, and only the one the job needs: a voice for
+  animated-text videos comes from your own phone recording, a Gemini key or fal; generated
+  footage and stills come from Replicate, fal or Higgsfield.
   Their prices work differently (per second, per image, credits), so choose what
   suits you. This engine's own voice and lip-sync scripts call fal, and its stills
   and generated footage call Replicate, so those two cover the most. Higgsfield
