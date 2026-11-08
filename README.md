@@ -12,4 +12,4 @@ You need [Claude Code](https://claude.com/claude-code) and a [Pipeboard](https:/
 
 Tested end to end on a fake ad account, not yet on a live&nbsp;one.
 
-<sub>The skills in `.claude/skills` come from other open-source projects and keep their own&nbsp;licenses.</sub>
+<sub>Bundled skills come from other open-source projects; see [CREDITS.md](CREDITS.md).</sub>
