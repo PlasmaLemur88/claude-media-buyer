@@ -2,7 +2,15 @@
 
 ![Claude makes your Meta ads and runs them. From How to AI.](assets/cover.jpg)
 
-**Claude runs your Meta ads.** It writes them, makes the videos, launches the campaign and checks it twice a&nbsp;day.
+**Claude runs your Meta ads**, from the first idea to the twice-a-day&nbsp;check.
+
+| What it does | Using |
+|---|---|
+| Reads your past ads and writes new ad ideas | Claude Code |
+| Makes the video ads and checks each one | Remotion, Kling, Seedance |
+| Builds and launches the campaign | Pipeboard, your Meta ad account |
+| Pauses losing ads and moves the budget by your rules | rules written as tested code |
+| Checks the account each week and plans the next ads | the claude-ads Meta audit |
 
 1. Open this folder in Claude Code and say **run my&nbsp;ads**.
 2. Tell it what you sell and your&nbsp;budget.
