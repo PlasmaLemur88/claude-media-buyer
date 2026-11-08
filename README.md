@@ -22,4 +22,4 @@ Tested end to end on a fake ad account, not yet on a live&nbsp;one.
 
 Claude can make mistakes with live ad spend, so read each report before you approve&nbsp;it. You are responsible for what your ad account spends, and the authors are not liable for results (MIT&nbsp;license).
 
-<sub>MIT license. Bundled skills come from other open-source projects and keep their own licenses; see [CREDITS.md](CREDITS.md).</sub>
+<sub>MIT license. Bundled skills come from other open-source projects and keep their own licenses; see&nbsp;[CREDITS.md](CREDITS.md).</sub>
