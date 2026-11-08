@@ -9,7 +9,7 @@ done when the file it leaves behind exists (and says PASS or approved where that
 matters), or when its scheduled task exists. Optional extras are listed apart,
 each with what you give up by skipping it.
 """
-import argparse, json, pathlib, re, sys
+import argparse, json, os, pathlib, re, sys
 
 
 def read(p):
@@ -45,7 +45,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--short", action="store_true")
     ap.add_argument("--root", default=str(pathlib.Path(__file__).resolve().parent.parent))
-    ap.add_argument("--cfg", default=str(pathlib.Path.home() / ".claude.json"))
+    ap.add_argument("--cfg", default=os.environ.get("ADS_CLAUDE_JSON") or str(pathlib.Path.home() / ".claude.json"))
     ap.add_argument("--tasks", default=str(pathlib.Path.home() / ".claude" / "scheduled-tasks"))
     ap.add_argument("--today", default=None, help="YYYY-MM-DD, for tests; defaults to this machine's date")
     a = ap.parse_args()

@@ -218,6 +218,10 @@ sign-ins. `ads/LOG.md` is the memory every run appends to.
   launch; and, for a fixed budget, the final report (`REPORT.md`) once, at 09:30 the day
   after end_date (fireAt), which also removes the other three tasks. Run the check-in once right away and show the result, so the first failure
   happens while the operator is watching. Tasks run only while the Claude app is open.
+  If the scheduled-tasks tool is not available in this chat, create nothing: no stand-in
+  that lives inside this chat, no cloud routine (it cannot see this folder). Say that
+  scheduling needs this folder opened in the Claude desktop app's Code tab, log a Failed
+  entry, and tell the operator the spend cap in Meta is the only guard until then.
 - **"Make them"**: run `ads/PRODUCTION.md` on the briefed queue. **"Weekly review"**:
   run `ads/WEEKLY.md` now. **"Write the campaign report"**: run `ads/REPORT.md` now.
 - **Replies to a report, typed in any chat**: "do it <numbers> @<time>", "show <n>",
@@ -244,6 +248,10 @@ sign-ins. `ads/LOG.md` is the memory every run appends to.
   today.json, takeover.json, actions.jsonl, the reports) into `ads/archive/<campaign
   name>/`, keep `ads/LEARNINGS.md` where it is, then start at `ads/STRATEGY.md` S1, which
   may copy answers from the archived brief.
+- **Nothing changes the ad account on a timer except the scheduled runs this file sets
+  up.** Never create an in-chat loop, a cron job or a watch that pauses, launches or moves
+  money later, even when the operator asks; offer the check-in instead, which runs the
+  money rules.
 - Every ad production makes goes through the same gates as any other ad: script
   approval, a yes before credits, the checks, the video-reviewer. The one exception
   is autopilot (end of `RULES.md`, `ads/CHECKIN.md` STEP 7), which builds the next

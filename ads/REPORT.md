@@ -7,7 +7,7 @@ STEP 0. Call get_ad_accounts. If the Pipeboard tools are missing or return an au
 STEP 1. Read `ads/CAMPAIGN.md` and all of `ads/LOG.md`.
 
 STEP 2. Read the results.
-- get_insights on campaign_id from start_date to end_date (or today, if the campaign is still running) at the campaign level, once in total and once with time_breakdown "day".
+- get_insights on campaign_id from start_date to end_date (or today, if the campaign is still running) at the campaign level, time_range as an object with since and until, once in total and once with time_breakdown "day".
 - The same window at the ad level, for every ad.
 - The result is the optimization_event in `ads/CAMPAIGN.md`, read under the one action_type `ads/CHECKIN.md` STEP 2 maps it to, never a sum of Meta's duplicate names.
 

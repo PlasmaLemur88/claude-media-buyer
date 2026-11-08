@@ -194,7 +194,9 @@ def decide(plan, today, logc):
 
     # a fixed campaign that is over: report only
     if policy == "fixed" and end_ok and date > end_ok:
-        out["notes"].append("past end_date: report only, no changes")
+        out["pause_campaign"] = True
+        out["ask"].append(f"The end date ({end_ok}) has passed. Pause the campaign if it is still running: reply 'pause the campaign'.")
+        out["notes"].append("past end_date: no budget changes; the only change is pausing the campaign")
         return finish()
     if policy == "fixed" and total and spent_missing:
         out["notes"].append("spend_to_date is missing from today.json; no budget change until the check-in reads it")
@@ -262,6 +264,22 @@ def decide(plan, today, logc):
         out["notes"].append("kept the last two active ads running")
 
     # 2. one budget change
+    # A lone day with spend and no results, while the other days convert, is most often a
+    # tracking gap; it is left out of the cost math once and the operator is asked to check.
+    if len(daily) >= 3:
+        res = [num(r.get("results"), 0) or 0 for r in daily]
+        gaps = []
+        for i, r in enumerate(daily):
+            others = [x for j, x in enumerate(res) if j != i]
+            if res[i] == 0 and (num(r.get("spend"), 0) or 0) > 0 and others and sum(others) / len(others) >= 10:
+                if not (i >= len(daily) - 2 and res[-1] == 0 and res[-2] == 0):
+                    gaps.append(r)
+        if len(gaps) == 1:
+            g = gaps[0]; avg_r = sum(res) / max(1, len(res) - 1)
+            daily = [r for r in daily if r is not g]
+            out["notes"].append(f"{g.get('date')} spent {fmt(num(g.get('spend'), 0))} with 0 results while the other days averaged {avg_r:,.0f}; treated as a tracking gap and left out of the cost math")
+            out["ask"].append(f"Check your own count for {g.get('date')}: Meta shows 0 results on {fmt(num(g.get('spend'), 0))} of spend. Reply with the real number if it differs.")
+
     def cpr(rows):
         s = sum(num(r.get("spend"), 0) or 0 for r in rows); n = sum(num(r.get("results"), 0) or 0 for r in rows)
         return s / n if n else (float("inf") if s > 0 else None)

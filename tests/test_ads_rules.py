@@ -58,7 +58,7 @@ check("fixed asks to raise total", any("total" in q for q in o["ask"]))
 
 # fixed: past the end date, no changes
 o = R.decide(f, dict(base, date="2026-11-20", daily=days(1000, 300), ads=ads((400, 0), (3000, 2000), (2000, 1500))), NOLOG)
-check("past end date: no changes", o["pauses"] == [] and o["budget"] is None)
+check("past end date: no changes but the pause", o["pauses"] == [] and o["budget"] is None and o["pause_campaign"] is True)
 
 # steady: never raises
 s = {"budget_policy": "steady", "target_cost_per_result": "1.50"}
@@ -264,6 +264,14 @@ check("an adopted fixed campaign stopped by its old spend gets the cap moved", o
 with tempfile.TemporaryDirectory() as d:
     lg = PL.Path(d) / "LOG.md"; lg.write_text("# Campaign log\n## 2026-11-12 Built video (autopilot)\npaths\n")
     check("a Built heading without a time still counts", R.log_today(lg, "2026-11-12")["video"] == 1)
+
+# --- what the rehearsal found
+wk = days(1000, 600); wk[3] = dict(wk[3], results=0)
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "1.80"}, dict(base, daily=wk, ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("a lone zero day among converting days is a tracking gap, not a cut", o["budget"] is None and any("tracking gap" in n for n in o["notes"]))
+wk2 = days(1000, 600); wk2[-1] = dict(wk2[-1], results=0); wk2[-2] = dict(wk2[-2], results=0)
+o = R.decide({"budget_policy": "steady", "target_cost_per_result": "1.50"}, dict(base, daily=wk2, ads=ads((3000, 2000), (2000, 1500))), NOLOG)
+check("two zero days at the end are real and cut", o["budget"] is not None and o["budget"]["to"] < 1000)
 
 print(f"\n  {run - fails} passed, {fails} failed")
 sys.exit(1 if fails else 0)
